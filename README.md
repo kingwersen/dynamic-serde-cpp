@@ -1,12 +1,12 @@
 # dynamic-serde-cpp
 
-C++ Serialization/Deserialization library that uses dynamic dispatch to decouple code compilation into separate archives. NOT header-only by design.
+C++ Serialization/Deserialization library that uses dynamic dispatch to decouple code compilation into separate archives. NOT header-only by design. API influenced by Rust [Serde](https://serde.rs/).
 
 This library aims to solve compilation speed and size challenges when working with a large number of data types and multiple serialization adapters at a small cost to execution speed.
 
-In the following example, `structs.hpp` does not include serialization. The serialization logic is contained entirely within `structs.cpp` and independent of the serialization adapter `JsonSerializer`.
+In the following example, `structs.hpp` does not include serialization. The serialization logic is contained entirely within `structs.cpp` and is independent of the serialization adapter `JsonSerializer`.
 
-If the user attempts to serialize an object that does not have serialize implemented, then it will throw an exception at runtime.
+If `serialize()` is not implemented for any type being serialized, then it will cause a linker error in the unit where the serialization is performed.
 ```
 // structs.hpp
 
@@ -24,10 +24,10 @@ using namespace kingw;
 
 template <>
 void kingw::ser::serialize<ExampleStruct>(ser::Serializer & serializer, const ExampleStruct & value) {
-    auto structs = serializer.serialize_struct();
-    structs.serialize_field(ser::accessor(value.name), "name");
-    structs.serialize_field(ser::accessor(value.value), "value");
-    structs.serialize_field(ser::accessor(value.items), "items");
+    serializer.serialize_struct()
+        .with_field(ser::accessor(value.name), "name")
+        .with_field(ser::accessor(value.value), "value")
+        .with_field(ser::accessor(value.items), "items");
 }
 ```
 ```
