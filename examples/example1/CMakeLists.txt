@@ -11,8 +11,4 @@ target_link_libraries(kingw_dynamic_serde_example1
     PUBLIC
         kingw::dynamic_serde_json
         kingw::dynamic_serde_xml
-        #-Wl,--whole-archive
-        kingw::ex_generated1
-        kingw::ex_generated2
-        #-Wl,--no-whole-archive
-        )
+        kingw::ex_generated1)
