@@ -3,6 +3,9 @@
 
 namespace kingw {
 
+JsonSerializer::SerializationException::SerializationException(const std::string & str)
+    : std::runtime_error(str) { }
+
 JsonSerializer::JsonSerializer(std::ostream & stream, bool pretty)
     : stream(stream), pretty(pretty) { }
 

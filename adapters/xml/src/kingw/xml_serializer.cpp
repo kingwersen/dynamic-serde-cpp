@@ -3,6 +3,9 @@
 
 namespace kingw {
 
+XmlSerializer::SerializationException::SerializationException(const std::string & str)
+    : std::runtime_error(str) { }
+
 XmlSerializer::XmlSerializer(std::ostream & stream)
     : stream(stream) { }
 

@@ -15,7 +15,7 @@ class JsonSerializer :
 public:
     class SerializationException : public std::runtime_error {
     public:
-        SerializationException(const std::string & str) : std::runtime_error(str) { }
+        explicit SerializationException(const std::string & str);
     };
 
     template <class T>
