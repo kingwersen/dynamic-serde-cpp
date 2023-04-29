@@ -10,6 +10,9 @@ target_include_directories(kingw_dynamic_serde
 target_sources(kingw_dynamic_serde
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/src/kingw/serde/serialize.cpp")
+target_link_options(kingw_dynamic_serde
+    PUBLIC
+        -u _serialize)
 
 add_library(kingw::dynamic_serde ALIAS kingw_dynamic_serde)
 

@@ -1,7 +1,5 @@
 #include "kingw/serde/serialize.hpp"
 
-#include <cstdint>
-
 
 namespace kingw {
 namespace ser {
@@ -13,10 +11,17 @@ Serializer::Seq::Seq(Serializer & serializer) : serializer(serializer) {
     serializer.serialize_seq_begin();
 }
 Serializer::Seq::~Seq() {
-    serializer.serialize_seq_end();
+    done();
 }
-void Serializer::Seq::serialize_element(const Dynamic & accessor) {
+Serializer::Seq & Serializer::Seq::with_element(const Dynamic & accessor) {
     serializer.serialize_seq_element(accessor);
+    return *this;
+}
+void Serializer::Seq::done() {
+    if (!closed) {
+        serializer.serialize_seq_end();
+        closed = true;
+    }
 }
 
 Serializer::Map Serializer::serialize_map() {
@@ -26,13 +31,21 @@ Serializer::Map::Map(Serializer & serializer) : serializer(serializer) {
     serializer.serialize_map_begin();
 }
 Serializer::Map::~Map() {
-    serializer.serialize_map_end();
+    done();
 }
-void Serializer::Map::serialize_key(const Dynamic & accessor) {
+Serializer::Map & Serializer::Map::with_key(const Dynamic & accessor) {
     serializer.serialize_map_key(accessor);
+    return *this;
 }
-void Serializer::Map::serialize_value(const Dynamic & accessor) {
+Serializer::Map & Serializer::Map::with_value(const Dynamic & accessor) {
     serializer.serialize_map_value(accessor);
+    return *this;
+}
+void Serializer::Map::done() {
+    if (!closed) {
+        serializer.serialize_map_end();
+        closed = true;
+    }
 }
 
 Serializer::Struct Serializer::serialize_struct() {
@@ -42,10 +55,17 @@ Serializer::Struct::Struct(Serializer & serializer) : serializer(serializer) {
     serializer.serialize_struct_begin();
 }
 Serializer::Struct::~Struct() {
-    serializer.serialize_struct_end();
+    done();
 }
-void Serializer::Struct::serialize_field(const Dynamic & accessor, const char * name) {
+Serializer::Struct & Serializer::Struct::with_field(const Dynamic & accessor, const char * name) {
     serializer.serialize_struct_field(accessor, name);
+    return *this;
+}
+void Serializer::Struct::done() {
+    if (!closed) {
+        serializer.serialize_struct_end();
+        closed = true;
+    }
 }
 
 template <>
@@ -105,5 +125,5 @@ void serialize<std::string>(Serializer & serializer, const std::string & data) {
     serializer.serialize_string(data);
 }
 
-}  // namespace ser
-}  // namespace kingw
+}
+}

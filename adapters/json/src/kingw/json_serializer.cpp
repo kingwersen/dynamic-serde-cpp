@@ -98,7 +98,7 @@ void JsonSerializer::serialize_map_begin() {
 
 void JsonSerializer::serialize_map_key(const ser::Dynamic & accessor) {
     if (!accessor.traits().is_string) {
-        throw ser::SerializationFailureException("JsonSerializer map key is not a string");
+        throw SerializationException("JsonSerializer map key is not a string");
     }
 
     // Print a comma only after the first key-value-pair.

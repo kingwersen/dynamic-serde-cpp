@@ -4,7 +4,9 @@ C++ Serialization/Deserialization library that uses dynamic dispatch to decouple
 
 This library aims to solve compilation speed and size challenges when working with a large number of data types and multiple serialization adapters at a small cost to execution speed.
 
-In the following example, `structs.hpp` does not include serialization. The serialization logic is contained entirely within `structs.cpp` and independent of the serialization adapter `JsonSerializer`. If the user attempts to serialize an object that does not have serialize implemented, then it will throw an exception at runtime.
+In the following example, `structs.hpp` does not include serialization. The serialization logic is contained entirely within `structs.cpp` and independent of the serialization adapter `JsonSerializer`.
+
+If the user attempts to serialize an object that does not have serialize implemented, then it will throw an exception at runtime.
 ```
 // structs.hpp
 

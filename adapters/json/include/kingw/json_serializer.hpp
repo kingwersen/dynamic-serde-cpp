@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <stack>
+#include <stdexcept>
 
 #include "kingw/serde/serialize.hpp"
 
@@ -12,6 +13,11 @@ class JsonSerializer :
     public ser::Serializer
 {
 public:
+    class SerializationException : public std::runtime_error {
+    public:
+        SerializationException(const std::string & str) : std::runtime_error(str) { }
+    };
+
     template <class T>
     static std::string to_string(const T & item, bool pretty = false) {
         std::ostringstream stream;

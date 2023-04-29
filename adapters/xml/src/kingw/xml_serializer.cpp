@@ -73,7 +73,7 @@ void XmlSerializer::serialize_map_begin() {
 }
 void XmlSerializer::serialize_map_key(const ser::Dynamic & accessor) {
     if (!accessor.traits().is_string) {
-        throw ser::SerializationFailureException("XmlSerializer map key is not a string");
+        throw SerializationException("XmlSerializer map key is not a string");
     }
     auto tag = XmlSerializer::to_string(accessor);
     stream << "<" << tag << ">";

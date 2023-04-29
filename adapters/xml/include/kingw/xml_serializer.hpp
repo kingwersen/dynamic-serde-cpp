@@ -12,6 +12,11 @@ class XmlSerializer :
     public ser::Serializer
 {
 public:
+    class SerializationException : public std::runtime_error {
+    public:
+        SerializationException(const std::string & str) : std::runtime_error(str) { }
+    };
+
     template <class T>
     static std::string to_string(const T & item) {
         std::ostringstream stream;
