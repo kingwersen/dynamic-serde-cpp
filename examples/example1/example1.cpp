@@ -10,9 +10,9 @@ int main() {
     MyStruct data{ 1, 500.0, { { "Hello", "World!" } } };
 
     // Ex1: Provide std::ostream to constructor
-    kingw::JsonSerializer serializer(std::cout, true);
+    kingw::JsonSerializer serializer;
     serializer.serialize(data);
-    std::cout << "\n";
+    std::cout << serializer.dumps() << "\n";
 
     // Ex2: Simple to_string()
     std::cout << kingw::XmlSerializer::to_string(data) << "\n";

@@ -1,29 +1,21 @@
 #pragma once
 
+#include <string>
 #include <sstream>
-#include <stack>
-#include <stdexcept>
-
-#include <nlohmann/json.hpp>
 
 #include "kingw/serde/serialize.hpp"
 
 
 namespace kingw {
 
-class JsonSerializer :
+class OStreamSerializer :
     public ser::Serializer
 {
 public:
-    class SerializationException : public std::runtime_error {
-    public:
-        explicit SerializationException(const std::string & str);
-    };
-
     template <class T>
-    static std::string to_string(const T & item, bool pretty = false) {
+    static std::string to_string(const T & item) {
         std::ostringstream stream;
-        JsonSerializer serializer(stream, pretty);
+        OStreamSerializer serializer(stream);
         ser::serialize(serializer, item);
         return stream.str();
     }
@@ -33,8 +25,7 @@ public:
         ser::serialize(*this, item);
     }
 
-    JsonSerializer();
-    std::string dump() const;
+    explicit OStreamSerializer(std::ostream & stream);
 
     // Basic Types
     void serialize_bool(bool value) override;
@@ -73,8 +64,7 @@ protected:
     void serialize_struct_end() override;
 
 private:
-    std::stack<nlohmann::json> json_stack;
-    std::string current_map_key;
+    std::ostream & stream;
 };
 
 }
