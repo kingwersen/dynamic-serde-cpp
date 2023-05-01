@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include "kingw/serde/serialize.hpp"
+#include "kingw/serde/accessor.hpp"
 
 
 namespace kingw {
@@ -21,20 +22,15 @@ public:
     };
 
     template <class T>
-    static std::string to_string(const T & item, bool pretty = false) {
-        std::ostringstream stream;
-        JsonSerializer serializer(stream, pretty);
+    static std::string to_string(const T & item) {
+        JsonSerializer serializer;
         ser::serialize(serializer, item);
-        return stream.str();
-    }
-
-    template <class T>
-    void serialize(const T & item) {
-        ser::serialize(*this, item);
+        return serializer.dump();
     }
 
     JsonSerializer();
     std::string dump() const;
+    bool is_human_readable() const override;
 
     // Basic Types
     void serialize_bool(bool value) override;

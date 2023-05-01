@@ -3,8 +3,12 @@
 
 namespace kingw {
 
-OStreamSerializer::OStreamSerializer(std::ostream & stream)
-    : stream(stream) { }
+OStreamSerializer::OStreamSerializer(std::ostream & stream, bool human_readable)
+    : stream(stream), human_readable(human_readable) { }
+
+bool OStreamSerializer::is_human_readable() const {
+    return human_readable;
+}
 
 void OStreamSerializer::serialize_bool(bool value) {
     stream << value;

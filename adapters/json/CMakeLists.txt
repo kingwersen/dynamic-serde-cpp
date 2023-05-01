@@ -11,6 +11,7 @@ target_include_directories(kingw_dynamic_serde_json
         "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_sources(kingw_dynamic_serde_json
     PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/kingw/json_deserializer.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/kingw/json_serializer.cpp")
 target_link_libraries(kingw_dynamic_serde_json
     PUBLIC

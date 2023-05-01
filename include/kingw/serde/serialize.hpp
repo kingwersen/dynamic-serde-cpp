@@ -13,6 +13,7 @@ class Serializer
 {
 public:
     virtual ~Serializer() = default;
+    virtual bool is_human_readable() const = 0;
 
     // Basic Types
     virtual void serialize_bool(bool value) = 0;

@@ -25,7 +25,8 @@ public:
         ser::serialize(*this, item);
     }
 
-    explicit OStreamSerializer(std::ostream & stream);
+    explicit OStreamSerializer(std::ostream & stream, bool human_readable = true);
+    bool is_human_readable() const override;
 
     // Basic Types
     void serialize_bool(bool value) override;
@@ -65,6 +66,7 @@ protected:
 
 private:
     std::ostream & stream;
+    bool human_readable;
 };
 
 }

@@ -2,8 +2,6 @@
 
 #include "kingw/serde/serialize.hpp"
 #include "kingw/serde/accessor.hpp"
-
-
 using namespace kingw;
 
 

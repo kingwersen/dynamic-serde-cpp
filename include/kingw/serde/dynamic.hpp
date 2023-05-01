@@ -6,14 +6,15 @@
 namespace kingw {
 namespace ser {
 
-// Defined in "kingw/serde/serialize.hpp"
 class Serializer;
+class Deserializer;
 
 class Dynamic
 {
 public:
     virtual ~Dynamic() = default;
     virtual void serialize(Serializer & serializer) const = 0;
+    virtual void deserialize(Deserializer & deserializer) = 0;
     virtual TypeTraits traits() const = 0;
 };
 

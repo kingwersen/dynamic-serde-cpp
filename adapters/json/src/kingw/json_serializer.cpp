@@ -22,6 +22,10 @@ std::string JsonSerializer::dump() const {
     }
 }
 
+bool JsonSerializer::is_human_readable() const {
+    return true;
+}
+
 void JsonSerializer::serialize_bool(bool value) {
     json_stack.top() = value;
 }

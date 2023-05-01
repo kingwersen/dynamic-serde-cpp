@@ -31,6 +31,7 @@ public:
     }
 
     explicit XmlSerializer(std::ostream & stream);
+    bool is_human_readable() const override;
 
     // Basic Types
     void serialize_bool(bool value) override;

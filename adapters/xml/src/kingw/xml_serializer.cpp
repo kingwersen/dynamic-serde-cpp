@@ -9,6 +9,10 @@ XmlSerializer::SerializationException::SerializationException(const std::string 
 XmlSerializer::XmlSerializer(std::ostream & stream)
     : stream(stream) { }
 
+bool XmlSerializer::is_human_readable() const {
+    return true;
+}
+
 void XmlSerializer::serialize_bool(bool value) {
     stream << value;
 }
