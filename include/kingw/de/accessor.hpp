@@ -195,8 +195,8 @@ public:
         while (map.has_next()) {
             K key{};
             V value{};
-            auto key_accessor = de::accessor(key);
-            auto value_accessor = de::accessor(value);
+            de::Accessor<K> key_accessor(key);
+            de::Accessor<V> value_accessor(value);
             map.next_entry(key_accessor, value_accessor);
             output[std::move(key)] = std::move(value);
         }
