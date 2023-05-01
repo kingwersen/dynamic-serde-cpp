@@ -2,12 +2,18 @@
 
 #include <cstdint>
 #include <string>
+#include <stdexcept>
 
 #include "kingw/ser/serialize.hpp"
 
 
 namespace kingw {
 namespace ser {
+
+class SerializationException : public std::runtime_error {
+public:
+    explicit SerializationException(const std::string & message);
+};
 
 class Serializer
 {

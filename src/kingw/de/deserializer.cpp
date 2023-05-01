@@ -6,11 +6,11 @@
 namespace kingw {
 namespace de {
 
-DeserializeException::DeserializeException(const std::string & message)
+DeserializationException::DeserializationException(const std::string & message)
     : std::runtime_error(message) { }
 
 Visitor::NotImplementedException::NotImplementedException(const std::string & message)
-    : DeserializeException(message) { }
+    : DeserializationException(message) { }
 
 // Default implementations for unused visitor functions.
 // If they are called when not implemented, throw a runtime exception.
@@ -68,7 +68,7 @@ void deserialize<bool>(Deserializer & deserializer, bool & data) {
             && value <= std::numeric_limits<SELF>::max()) {     \
             data = static_cast<SELF>(value);                    \
         } else {                                                \
-            throw DeserializeException("number outside range"); \
+            throw DeserializationException("number outside range"); \
         }                                                       \
     }
 
@@ -309,7 +309,7 @@ namespace {
             if (value.size() == 1) {
                 data = value[0];
             } else {
-                throw DeserializeException("string does not contain exactly one character");
+                throw DeserializationException("string does not contain exactly one character");
             }
         }
     };

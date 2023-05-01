@@ -14,9 +14,9 @@ class JsonDeserializer :
     public de::Deserializer
 {
 public:
-    class DeserializationException : public de::DeserializeException {
+    class JsonDeserializationException : public de::DeserializationException {
     public:
-        explicit DeserializationException(const std::string & message);
+        explicit JsonDeserializationException(const std::string & message);
     };
 
     template <class T>

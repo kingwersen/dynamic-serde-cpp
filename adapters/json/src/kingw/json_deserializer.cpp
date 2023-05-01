@@ -5,8 +5,8 @@
 
 namespace kingw {
 
-JsonDeserializer::DeserializationException::DeserializationException(const std::string & message)
-    : de::DeserializeException(message) { }
+JsonDeserializer::JsonDeserializationException::JsonDeserializationException(const std::string & message)
+    : de::DeserializationException(message) { }
 
 JsonDeserializer::JsonDeserializer(const nlohmann::json & contents) {
     json_stack.push({ contents });
@@ -22,14 +22,14 @@ bool JsonDeserializer::is_human_readable() const {
 
 // Basic Types
 void JsonDeserializer::deserialize_any(de::Visitor & visitor) {
-    throw DeserializationException("deserialize_any() not implemented");
+    throw JsonDeserializationException("deserialize_any() not implemented");
 }
 void JsonDeserializer::deserialize_bool(de::Visitor & visitor) {
     auto & json = json_stack.top();
     if (json.is_boolean()) {
         visitor.visit_bool(json);
     } else {
-        throw DeserializationException("json value was not boolean");
+        throw JsonDeserializationException("json value was not boolean");
     }
 }
 void JsonDeserializer::deserialize_i8(de::Visitor & visitor) {
@@ -37,7 +37,7 @@ void JsonDeserializer::deserialize_i8(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_i8(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_i16(de::Visitor & visitor) {
@@ -45,7 +45,7 @@ void JsonDeserializer::deserialize_i16(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_i16(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_i32(de::Visitor & visitor) {
@@ -53,7 +53,7 @@ void JsonDeserializer::deserialize_i32(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_i32(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_i64(de::Visitor & visitor) {
@@ -61,7 +61,7 @@ void JsonDeserializer::deserialize_i64(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_i64(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_u8(de::Visitor & visitor) {
@@ -69,7 +69,7 @@ void JsonDeserializer::deserialize_u8(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_u8(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_u16(de::Visitor & visitor) {
@@ -77,7 +77,7 @@ void JsonDeserializer::deserialize_u16(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_u16(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_u32(de::Visitor & visitor) {
@@ -85,7 +85,7 @@ void JsonDeserializer::deserialize_u32(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_u32(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_u64(de::Visitor & visitor) {
@@ -93,7 +93,7 @@ void JsonDeserializer::deserialize_u64(de::Visitor & visitor) {
     if (json.is_number_integer()) {
         visitor.visit_u64(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_f32(de::Visitor & visitor) {
@@ -101,7 +101,7 @@ void JsonDeserializer::deserialize_f32(de::Visitor & visitor) {
     if (json.is_number_float() || json.is_number_integer()) {
         visitor.visit_f32(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_f64(de::Visitor & visitor) {
@@ -109,7 +109,7 @@ void JsonDeserializer::deserialize_f64(de::Visitor & visitor) {
     if (json.is_number_float() || json.is_number_integer()) {
         visitor.visit_f64(json);
     } else {
-        throw DeserializationException("json value was not a number");
+        throw JsonDeserializationException("json value was not a number");
     }
 }
 void JsonDeserializer::deserialize_char(de::Visitor & visitor) {
@@ -120,7 +120,7 @@ void JsonDeserializer::deserialize_string(de::Visitor & visitor) {
     if (json.is_string()) {
         visitor.visit_string(json);
     } else {
-        throw DeserializationException("json value was not a string");
+        throw JsonDeserializationException("json value was not a string");
     }
 }
 void JsonDeserializer::deserialize_seq(de::Visitor & visitor) {
@@ -129,7 +129,7 @@ void JsonDeserializer::deserialize_seq(de::Visitor & visitor) {
         JsonSeqAccess seq(json);
         visitor.visit_seq(seq);
     } else {
-        throw DeserializationException("json value was not a sequence");
+        throw JsonDeserializationException("json value was not a sequence");
     }
 }
 void JsonDeserializer::deserialize_map(de::Visitor & visitor) {
@@ -138,7 +138,7 @@ void JsonDeserializer::deserialize_map(de::Visitor & visitor) {
         JsonMapAccess map(json);
         visitor.visit_map(map);
     } else {
-        throw DeserializationException("json value was not a map");
+        throw JsonDeserializationException("json value was not a map");
     }
 }
 
@@ -154,7 +154,7 @@ void JsonDeserializer::JsonSeqAccess::next_element(de::Deserialize & element) {
         element.deserialize(deserializer);
         ++iter;
     } else {
-        throw DeserializationException("json end of sequence reached");
+        throw JsonDeserializationException("json end of sequence reached");
     }
 }
 
@@ -169,7 +169,7 @@ void JsonDeserializer::JsonMapAccess::next_key(de::Deserialize & key) {
         JsonDeserializer deserializer(std::string("\"") + iter.key() + "\"");
         key.deserialize(deserializer);
     } else {
-        throw DeserializationException("json end of map reached");
+        throw JsonDeserializationException("json end of map reached");
     }
 }
 void JsonDeserializer::JsonMapAccess::next_value(de::Deserialize & value) {
@@ -179,7 +179,7 @@ void JsonDeserializer::JsonMapAccess::next_value(de::Deserialize & value) {
         value.deserialize(deserializer);
         ++iter;
     } else {
-        throw DeserializationException("json end of map reached");
+        throw JsonDeserializationException("json end of map reached");
     }
 }
 void JsonDeserializer::JsonMapAccess::next_entry(de::Deserialize & key, de::Deserialize & value) {

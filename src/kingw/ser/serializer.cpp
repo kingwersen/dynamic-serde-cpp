@@ -4,6 +4,9 @@
 namespace kingw {
 namespace ser {
 
+SerializationException::SerializationException(const std::string & message)
+    : std::runtime_error(message) { }
+
 Serializer::Seq Serializer::serialize_seq() {
     return Seq{ *this };
 }

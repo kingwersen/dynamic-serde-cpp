@@ -10,9 +10,9 @@
 namespace kingw {
 namespace de {
 
-class DeserializeException : public std::runtime_error {
+class DeserializationException : public std::runtime_error {
 public:
-    explicit DeserializeException(const std::string & message);
+    explicit DeserializationException(const std::string & message);
 };
 
 class Visitor;
@@ -64,7 +64,7 @@ public:
 class Visitor
 {
 public:
-    class NotImplementedException : public DeserializeException {
+    class NotImplementedException : public DeserializationException {
     public:
         explicit NotImplementedException(const std::string & message);
     };

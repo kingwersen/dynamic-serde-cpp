@@ -5,8 +5,8 @@
 
 namespace kingw {
 
-JsonSerializer::SerializationException::SerializationException(const std::string & str)
-    : std::runtime_error(str) { }
+JsonSerializer::JsonSerializationException::JsonSerializationException(const std::string & message)
+    : ser::SerializationException(message) { }
 
 JsonSerializer::JsonSerializer() {
     json_stack.push({});
@@ -18,7 +18,7 @@ std::string JsonSerializer::dump() const {
     } else {
         // Logic error - this shouldn't occur if the user is using
         // serialize_seq(), _map(), _struct(), etc.
-        throw SerializationException("JsonSerializer internal data structure corrupted during serialization");
+        throw JsonSerializationException("JsonSerializer internal data structure corrupted during serialization");
     }
 }
 
@@ -86,7 +86,7 @@ void JsonSerializer::serialize_seq_element(const ser::Serialize & accessor) {
     if (json_stack.size() < 2) {
         // Logic error - this shouldn't occur if the user is using
         // serialize_seq(), _map(), _struct(), etc.
-        throw SerializationException("JsonSerializer internal data structure corrupted during serialization");
+        throw JsonSerializationException("JsonSerializer internal data structure corrupted during serialization");
     }
     nlohmann::json json = std::move(json_stack.top());
     json_stack.pop();
@@ -110,7 +110,7 @@ void JsonSerializer::serialize_map_begin() {
 
 void JsonSerializer::serialize_map_key(const ser::Serialize & accessor) {
     if (!accessor.traits().is_string) {
-        throw SerializationException("JsonSerializer map key is not a string");
+        throw JsonSerializationException("JsonSerializer map key is not a string");
     }
 
     // Convert the key into a string.
@@ -126,7 +126,7 @@ void JsonSerializer::serialize_map_value(const ser::Serialize & accessor) {
     if (json_stack.size() < 2) {
         // Logic error - this shouldn't occur if the user is using
         // serialize_seq(), _map(), _struct(), etc.
-        throw SerializationException("JsonSerializer internal data structure corrupted during serialization");
+        throw JsonSerializationException("JsonSerializer internal data structure corrupted during serialization");
     }
     nlohmann::json value = std::move(json_stack.top());
     json_stack.pop();
@@ -156,7 +156,7 @@ void JsonSerializer::serialize_struct_field(const ser::Serialize & accessor, con
     if (json_stack.size() < 2) {
         // Logic error - this shouldn't occur if the user is using
         // serialize_seq(), _map(), _struct(), etc.
-        throw SerializationException("JsonSerializer internal data structure corrupted during serialization");
+        throw JsonSerializationException("JsonSerializer internal data structure corrupted during serialization");
     }
     nlohmann::json field = std::move(json_stack.top());
     json_stack.pop();
