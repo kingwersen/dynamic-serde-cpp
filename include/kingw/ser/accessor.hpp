@@ -26,8 +26,8 @@ public:
     void serialize(Serializer & serializer) const override {
         ser::serialize(serializer, item);
     }
-    TypeTraits traits() const override {
-        return TypeTraits::of<T>();
+    serde::TypeTraits traits() const override {
+        return serde::TypeTraits::of<T>();
     };
 private:
     const T & item;
