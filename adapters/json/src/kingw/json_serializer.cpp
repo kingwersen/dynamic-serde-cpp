@@ -80,7 +80,7 @@ void JsonSerializer::serialize_seq_begin() {
     // at the top of the stack.
 }
 
-void JsonSerializer::serialize_seq_element(const ser::Dynamic & accessor) {
+void JsonSerializer::serialize_seq_element(const ser::Serialize & accessor) {
     json_stack.push({});
     accessor.serialize(*this);
     if (json_stack.size() < 2) {
@@ -108,7 +108,7 @@ void JsonSerializer::serialize_map_begin() {
     // at the top of the stack.
 }
 
-void JsonSerializer::serialize_map_key(const ser::Dynamic & accessor) {
+void JsonSerializer::serialize_map_key(const ser::Serialize & accessor) {
     if (!accessor.traits().is_string) {
         throw SerializationException("JsonSerializer map key is not a string");
     }
@@ -117,7 +117,7 @@ void JsonSerializer::serialize_map_key(const ser::Dynamic & accessor) {
     current_map_key = kingw::OStreamSerializer::to_string(accessor);
 }
 
-void JsonSerializer::serialize_map_value(const ser::Dynamic & accessor) {
+void JsonSerializer::serialize_map_value(const ser::Serialize & accessor) {
     // Add a new nlohmann::json object to the top of the stack.
     // accessor.serialize() will update it recursively.
     std::string name = std::move(current_map_key);
@@ -148,7 +148,7 @@ void JsonSerializer::serialize_struct_begin() {
     // at the top of the stack.
 }
 
-void JsonSerializer::serialize_struct_field(const ser::Dynamic & accessor, const char * name) {
+void JsonSerializer::serialize_struct_field(const ser::Serialize & accessor, const char * name) {
     // Add a new nlohmann::json object to the top of the stack.
     // accessor.serialize() will update it recursively.
     json_stack.push({});

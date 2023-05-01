@@ -6,15 +6,17 @@
 namespace kingw {
 namespace ser {
 
+// Forward-declare from "kingw/ser/serializer.hpp"
 class Serializer;
-class Deserializer;
 
-class Dynamic
+template <class T>
+void serialize(Serializer & serializer, const T & data);
+
+class Serialize
 {
 public:
-    virtual ~Dynamic() = default;
+    virtual ~Serialize() = default;
     virtual void serialize(Serializer & serializer) const = 0;
-    virtual void deserialize(Deserializer & deserializer) = 0;
     virtual TypeTraits traits() const = 0;
 };
 

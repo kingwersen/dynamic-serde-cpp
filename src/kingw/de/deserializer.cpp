@@ -1,10 +1,10 @@
-#include "kingw/serde/deserialize.hpp"
+#include "kingw/de/deserializer.hpp"
 
 #include <limits>
 
 
 namespace kingw {
-namespace ser {
+namespace de {
 
 DeserializeException::DeserializeException(const std::string & message)
     : std::runtime_error(message) { }
@@ -32,7 +32,7 @@ void Visitor::visit_map(Deserializer::MapAccess & value) { throw NotImplementedE
 
 
 template <>
-void deserialize<Dynamic>(Deserializer & deserializer, Dynamic & accessor) {
+void deserialize<Deserialize>(Deserializer & deserializer, Deserialize & accessor) {
     accessor.deserialize(deserializer);
 }
 
@@ -337,5 +337,5 @@ void deserialize<std::string>(Deserializer & deserializer, std::string & data) {
     deserializer.deserialize_string(visitor);
 }
 
-}  // namespace ser
+}  // namespace de
 }  // namespace kingw

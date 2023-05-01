@@ -4,11 +4,11 @@
 #include <string>
 #include <stdexcept>
 
-#include "kingw/serde/dynamic.hpp"
+#include "kingw/de/deserialize.hpp"
 
 
 namespace kingw {
-namespace ser {
+namespace de {
 
 class DeserializeException : public std::runtime_error {
 public:
@@ -47,7 +47,7 @@ public:
     public:
         virtual ~SeqAccess() = default;
         virtual bool has_next() = 0;
-        virtual void next_element(Dynamic & element) = 0;
+        virtual void next_element(Deserialize & element) = 0;
     };
 
     class MapAccess
@@ -55,9 +55,9 @@ public:
     public:
         virtual ~MapAccess() = default;
         virtual bool has_next() = 0;
-        virtual void next_key(Dynamic & key) = 0;
-        virtual void next_value(Dynamic & value) = 0;
-        virtual void next_entry(Dynamic & key, Dynamic & value) = 0;
+        virtual void next_key(Deserialize & key) = 0;
+        virtual void next_value(Deserialize & value) = 0;
+        virtual void next_entry(Deserialize & key, Deserialize & value) = 0;
     };
 };
 
@@ -89,8 +89,7 @@ public:
     virtual void visit_map(Deserializer::MapAccess & value);
 };
 
-template <class T>
-void deserialize(Deserializer & deserializer, T & data);
-
-}  // namespace ser
+}  // namespace de
 }  // namespace kingw
+
+#include "kingw/de/accessor.hpp"

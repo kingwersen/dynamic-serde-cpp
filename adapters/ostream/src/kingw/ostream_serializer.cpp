@@ -62,7 +62,7 @@ void OStreamSerializer::serialize_seq_begin() {
     // No-op
 }
 
-void OStreamSerializer::serialize_seq_element(const ser::Dynamic & accessor) {
+void OStreamSerializer::serialize_seq_element(const ser::Serialize & accessor) {
     accessor.serialize(*this);
 }
 
@@ -79,11 +79,11 @@ void OStreamSerializer::serialize_map_begin() {
     // No-op
 }
 
-void OStreamSerializer::serialize_map_key(const ser::Dynamic & accessor) {
+void OStreamSerializer::serialize_map_key(const ser::Serialize & accessor) {
     accessor.serialize(*this);
 }
 
-void OStreamSerializer::serialize_map_value(const ser::Dynamic & accessor) {
+void OStreamSerializer::serialize_map_value(const ser::Serialize & accessor) {
     accessor.serialize(*this);
 }
 
@@ -100,7 +100,7 @@ void OStreamSerializer::serialize_struct_begin() {
     // No-op
 }
 
-void OStreamSerializer::serialize_struct_field(const ser::Dynamic & accessor, const char * name) {
+void OStreamSerializer::serialize_struct_field(const ser::Serialize & accessor, const char * name) {
     serialize_c_str(name);
     accessor.serialize(*this);
 }

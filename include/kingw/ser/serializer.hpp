@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-#include "kingw/serde/dynamic.hpp"
+#include "kingw/ser/serialize.hpp"
 
 
 namespace kingw {
@@ -36,8 +36,8 @@ public:
     public:
         Map(Serializer & serializer);
         ~Map();
-        Map & with_key(const Dynamic & accessor);
-        Map & with_value(const Dynamic & accessor);
+        Map & with_key(const Serialize & accessor);
+        Map & with_value(const Serialize & accessor);
         void done();
     private:
         Serializer & serializer;
@@ -50,7 +50,7 @@ public:
     public:
         Struct(Serializer & serializer);
         ~Struct();
-        Struct & with_field(const Dynamic & accessor, const char * name);
+        Struct & with_field(const Serialize & accessor, const char * name);
         void done();
     private:
         Serializer & serializer;
@@ -63,7 +63,7 @@ public:
     public:
         Seq(Serializer & serializer);
         ~Seq();
-        Seq & with_element(const Dynamic & accessor);
+        Seq & with_element(const Serialize & accessor);
         void done();
     private:
         Serializer & serializer;
@@ -73,21 +73,20 @@ public:
 
 protected:
     virtual void serialize_seq_begin() = 0;
-    virtual void serialize_seq_element(const Dynamic & accessor) = 0;
+    virtual void serialize_seq_element(const Serialize & accessor) = 0;
     virtual void serialize_seq_end() = 0;
 
     virtual void serialize_map_begin() = 0;
-    virtual void serialize_map_key(const Dynamic & accessor) = 0;
-    virtual void serialize_map_value(const Dynamic & accessor) = 0;
+    virtual void serialize_map_key(const Serialize & accessor) = 0;
+    virtual void serialize_map_value(const Serialize & accessor) = 0;
     virtual void serialize_map_end() = 0;
 
     virtual void serialize_struct_begin() = 0;
-    virtual void serialize_struct_field(const Dynamic & accessor, const char * name) = 0;
+    virtual void serialize_struct_field(const Serialize & accessor, const char * name) = 0;
     virtual void serialize_struct_end() = 0;
 };
 
-template <class T>
-void serialize(Serializer & serializer, const T & data);
-
 }  // namespace ser
 }  // namespace kingw
+
+#include "kingw/ser/accessor.hpp"

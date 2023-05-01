@@ -1,7 +1,7 @@
 #include "structs2.hpp"
 
-#include "kingw/serde/serialize.hpp"
-#include "kingw/serde/accessor.hpp"
+#include "kingw/ser/serialize.hpp"
+#include "kingw/ser/accessor.hpp"
 using namespace kingw;
 
 

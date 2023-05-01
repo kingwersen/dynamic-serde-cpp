@@ -63,7 +63,7 @@ void XmlSerializer::serialize_string(const std::string & value) {
 
 void XmlSerializer::serialize_seq_begin() {
 }
-void XmlSerializer::serialize_seq_element(const ser::Dynamic & accessor) {
+void XmlSerializer::serialize_seq_element(const ser::Serialize & accessor) {
     stream << "<element>";
     accessor.serialize(*this);
     stream << "</element>";
@@ -78,7 +78,7 @@ void XmlSerializer::serialize_seq_end() {
 
 void XmlSerializer::serialize_map_begin() {
 }
-void XmlSerializer::serialize_map_key(const ser::Dynamic & accessor) {
+void XmlSerializer::serialize_map_key(const ser::Serialize & accessor) {
     if (!accessor.traits().is_string) {
         throw SerializationException("XmlSerializer map key is not a string");
     }
@@ -86,7 +86,7 @@ void XmlSerializer::serialize_map_key(const ser::Dynamic & accessor) {
     stream << "<" << tag << ">";
     open_tags.push(std::move(tag));
 }
-void XmlSerializer::serialize_map_value(const ser::Dynamic & accessor) {
+void XmlSerializer::serialize_map_value(const ser::Serialize & accessor) {
     accessor.serialize(*this);
 }
 void XmlSerializer::serialize_map_end() {
@@ -101,7 +101,7 @@ void XmlSerializer::serialize_map_end() {
 
 void XmlSerializer::serialize_struct_begin() {
 }
-void XmlSerializer::serialize_struct_field(const ser::Dynamic & accessor, const char * name) {
+void XmlSerializer::serialize_struct_field(const ser::Serialize & accessor, const char * name) {
     stream << "<";
     serialize_c_str(name);
     stream << ">";

@@ -1,13 +1,11 @@
 #pragma once
 
-#include <sstream>
 #include <stack>
 #include <stdexcept>
 
 #include <nlohmann/json.hpp>
 
-#include "kingw/serde/serialize.hpp"
-#include "kingw/serde/accessor.hpp"
+#include "kingw/ser/serializer.hpp"
 
 
 namespace kingw {
@@ -52,20 +50,20 @@ protected:
     // Lists/Sequences
     // Use serialize_seq() instead.
     void serialize_seq_begin() override;
-    void serialize_seq_element(const ser::Dynamic & accessor) override;
+    void serialize_seq_element(const ser::Serialize & accessor) override;
     void serialize_seq_end() override;
 
     // Maps
     // Use serialize_map() instead.
     void serialize_map_begin() override;
-    void serialize_map_key(const ser::Dynamic & accessor) override;
-    void serialize_map_value(const ser::Dynamic & accessor) override;
+    void serialize_map_key(const ser::Serialize & accessor) override;
+    void serialize_map_value(const ser::Serialize & accessor) override;
     void serialize_map_end() override;
 
     // Structs
     // Use serialize_struct() instead.
     void serialize_struct_begin() override;
-    void serialize_struct_field(const ser::Dynamic & accessor, const char * name) override;
+    void serialize_struct_field(const ser::Serialize & accessor, const char * name) override;
     void serialize_struct_end() override;
 
 private:
@@ -73,4 +71,4 @@ private:
     std::string current_map_key;
 };
 
-}
+}  // namespace kingw

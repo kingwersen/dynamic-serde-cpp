@@ -1,4 +1,4 @@
-#include "kingw/serde/serialize.hpp"
+#include "kingw/ser/serializer.hpp"
 
 
 namespace kingw {
@@ -13,7 +13,7 @@ Serializer::Seq::Seq(Serializer & serializer) : serializer(serializer) {
 Serializer::Seq::~Seq() {
     done();
 }
-Serializer::Seq & Serializer::Seq::with_element(const Dynamic & accessor) {
+Serializer::Seq & Serializer::Seq::with_element(const Serialize & accessor) {
     serializer.serialize_seq_element(accessor);
     return *this;
 }
@@ -33,11 +33,11 @@ Serializer::Map::Map(Serializer & serializer) : serializer(serializer) {
 Serializer::Map::~Map() {
     done();
 }
-Serializer::Map & Serializer::Map::with_key(const Dynamic & accessor) {
+Serializer::Map & Serializer::Map::with_key(const Serialize & accessor) {
     serializer.serialize_map_key(accessor);
     return *this;
 }
-Serializer::Map & Serializer::Map::with_value(const Dynamic & accessor) {
+Serializer::Map & Serializer::Map::with_value(const Serialize & accessor) {
     serializer.serialize_map_value(accessor);
     return *this;
 }
@@ -57,7 +57,7 @@ Serializer::Struct::Struct(Serializer & serializer) : serializer(serializer) {
 Serializer::Struct::~Struct() {
     done();
 }
-Serializer::Struct & Serializer::Struct::with_field(const Dynamic & accessor, const char * name) {
+Serializer::Struct & Serializer::Struct::with_field(const Serialize & accessor, const char * name) {
     serializer.serialize_struct_field(accessor, name);
     return *this;
 }
@@ -69,7 +69,7 @@ void Serializer::Struct::done() {
 }
 
 template <>
-void serialize<Dynamic>(Serializer & serializer, const Dynamic & accessor) {
+void serialize<Serialize>(Serializer & serializer, const Serialize & accessor) {
     accessor.serialize(serializer);
 }
 template <>

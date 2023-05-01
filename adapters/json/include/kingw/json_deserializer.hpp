@@ -1,21 +1,20 @@
 #pragma once
 
-#include <sstream>
 #include <stack>
 #include <stdexcept>
 
 #include <nlohmann/json.hpp>
 
-#include "kingw/serde/deserialize.hpp"
+#include "kingw/de/deserializer.hpp"
 
 
 namespace kingw {
 
 class JsonDeserializer :
-    public ser::Deserializer
+    public de::Deserializer
 {
 public:
-    class DeserializationException : public ser::DeserializeException {
+    class DeserializationException : public de::DeserializeException {
     public:
         explicit DeserializationException(const std::string & message);
     };
@@ -23,14 +22,14 @@ public:
     template <class T>
     static void from_string(const T & item, const std::string & contents) {
         JsonDeserializer deserializer(contents);
-        ser::deserialize(deserializer, item);
+        de::deserialize(deserializer, item);
     }
 
     template <class T>
     static T from_string(const std::string & contents) {
         T item;
         JsonDeserializer deserializer(contents);
-        ser::deserialize(deserializer, item);
+        de::deserialize(deserializer, item);
         return item;
     }
 
@@ -39,42 +38,42 @@ public:
     bool is_human_readable() const override;
 
     // Basic Types
-    void deserialize_any(ser::Visitor & visitor) override;
-    void deserialize_bool(ser::Visitor & visitor) override;
-    void deserialize_i8(ser::Visitor & visitor) override;
-    void deserialize_i16(ser::Visitor & visitor) override;
-    void deserialize_i32(ser::Visitor & visitor) override;
-    void deserialize_i64(ser::Visitor & visitor) override;
-    void deserialize_u8(ser::Visitor & visitor) override;
-    void deserialize_u16(ser::Visitor & visitor) override;
-    void deserialize_u32(ser::Visitor & visitor) override;
-    void deserialize_u64(ser::Visitor & visitor) override;
-    void deserialize_f32(ser::Visitor & visitor) override;
-    void deserialize_f64(ser::Visitor & visitor) override;
-    void deserialize_char(ser::Visitor & visitor) override;
-    void deserialize_string(ser::Visitor & visitor) override;
-    void deserialize_seq(ser::Visitor & visitor) override;
-    void deserialize_map(ser::Visitor & visitor) override;
+    void deserialize_any(de::Visitor & visitor) override;
+    void deserialize_bool(de::Visitor & visitor) override;
+    void deserialize_i8(de::Visitor & visitor) override;
+    void deserialize_i16(de::Visitor & visitor) override;
+    void deserialize_i32(de::Visitor & visitor) override;
+    void deserialize_i64(de::Visitor & visitor) override;
+    void deserialize_u8(de::Visitor & visitor) override;
+    void deserialize_u16(de::Visitor & visitor) override;
+    void deserialize_u32(de::Visitor & visitor) override;
+    void deserialize_u64(de::Visitor & visitor) override;
+    void deserialize_f32(de::Visitor & visitor) override;
+    void deserialize_f64(de::Visitor & visitor) override;
+    void deserialize_char(de::Visitor & visitor) override;
+    void deserialize_string(de::Visitor & visitor) override;
+    void deserialize_seq(de::Visitor & visitor) override;
+    void deserialize_map(de::Visitor & visitor) override;
 
-    class JsonSeqAccess : public ser::Deserializer::SeqAccess
+    class JsonSeqAccess : public de::Deserializer::SeqAccess
     {
     public:
         explicit JsonSeqAccess(nlohmann::json seq);
         bool has_next();
-        void next_element(ser::Dynamic & element);
+        void next_element(de::Deserialize & element);
     private:
         nlohmann::json seq;
         decltype(seq.begin()) iter;
     };
 
-    class JsonMapAccess : public ser::Deserializer::MapAccess
+    class JsonMapAccess : public de::Deserializer::MapAccess
     {
     public:
         explicit JsonMapAccess(nlohmann::json map);
         bool has_next() override;
-        void next_key(ser::Dynamic & key) override;
-        void next_value(ser::Dynamic & value) override;
-        void next_entry(ser::Dynamic & key, ser::Dynamic & value) override;
+        void next_key(de::Deserialize & key) override;
+        void next_value(de::Deserialize & value) override;
+        void next_entry(de::Deserialize & key, de::Deserialize & value) override;
     private:
         nlohmann::json map;
         decltype(nlohmann::json().items()) items;
