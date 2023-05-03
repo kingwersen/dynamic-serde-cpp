@@ -45,8 +45,9 @@ void serialize(Serializer & serializer, const T (&data)[N]) {
     } else {
         auto seq = serializer.serialize_seq();
         for (const auto & element : data) {
-            seq.with_element(accessor(element));
+            seq.serialize_element(ser::accessor(element));
         }
+        seq.end();
     }
 }
 
@@ -54,17 +55,18 @@ template <class T>
 void serialize(Serializer & serializer, const std::vector<T> & data) {
     auto seq = serializer.serialize_seq();
     for (const auto & element : data) {
-        seq.with_element(accessor(element));
+        seq.serialize_element(ser::accessor(element));
     }
+    seq.end();
 }
 
 template <class K, class V>
 void serialize(Serializer & serializer, const std::map<K, V> & data) {
     auto map = serializer.serialize_map();
     for (const auto & kvp : data) {
-        map.with_key(accessor(kvp.first));
-        map.with_value(accessor(kvp.second));
+        map.serialize_entry(ser::accessor(kvp.first), ser::accessor(kvp.second));
     }
+    map.end();
 }
 
 }  // namespace ser

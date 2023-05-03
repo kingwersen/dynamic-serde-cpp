@@ -37,59 +37,63 @@ public:
     virtual void serialize_c_str(const char * value) = 0;
     virtual void serialize_string(const std::string & value) = 0;
 
-    class Map
+    class SerializeSeq
     {
     public:
-        Map(Serializer & serializer);
-        ~Map();
-        Map & with_key(const Serialize & accessor);
-        Map & with_value(const Serialize & accessor);
-        void done();
+        SerializeSeq(Serializer & serializer);
+        ~SerializeSeq();
+        void serialize_element(const Serialize & accessor);
+        void end();
     private:
         Serializer & serializer;
         bool closed = false;
     };
-    virtual Map serialize_map();
+    virtual SerializeSeq serialize_seq();
 
-    class Struct
+    class SerializeMap
     {
     public:
-        Struct(Serializer & serializer);
-        ~Struct();
-        Struct & with_field(const Serialize & accessor, const char * name);
-        void done();
+        SerializeMap(Serializer & serializer);
+        ~SerializeMap();
+        void serialize_key(const Serialize & key);
+        void serialize_value(const Serialize & value);
+        void serialize_entry(const Serialize & key, const Serialize & value);
+        void end();
     private:
         Serializer & serializer;
         bool closed = false;
     };
-    virtual Struct serialize_struct();  
+    virtual SerializeMap serialize_map();
 
-    class Seq
+    class SerializeStruct
     {
     public:
-        Seq(Serializer & serializer);
-        ~Seq();
-        Seq & with_element(const Serialize & accessor);
-        void done();
+        SerializeStruct(Serializer & serializer);
+        ~SerializeStruct();
+        void serialize_field(const char* name, const Serialize & accessor);
+        void skip_field(const char* name);
+        void end();
     private:
         Serializer & serializer;
         bool closed = false;
     };
-    virtual Seq serialize_seq();
+    virtual SerializeStruct serialize_struct();  
 
 protected:
-    virtual void serialize_seq_begin() = 0;
-    virtual void serialize_seq_element(const Serialize & accessor) = 0;
-    virtual void serialize_seq_end() = 0;
+    virtual void seq_begin() = 0;
+    virtual void seq_serialize_element(const Serialize & accessor) = 0;
+    virtual void seq_end() = 0;
 
-    virtual void serialize_map_begin() = 0;
-    virtual void serialize_map_key(const Serialize & accessor) = 0;
-    virtual void serialize_map_value(const Serialize & accessor) = 0;
-    virtual void serialize_map_end() = 0;
+    virtual void map_begin() = 0;
+    virtual void map_serialize_key(const Serialize & accessor) = 0;
+    virtual void map_serialize_value(const Serialize & accessor) = 0;
+    virtual void map_serialize_entry(const Serialize & key, const Serialize & value) = 0;
+    virtual void map_end() = 0;
 
-    virtual void serialize_struct_begin() = 0;
-    virtual void serialize_struct_field(const Serialize & accessor, const char * name) = 0;
-    virtual void serialize_struct_end() = 0;
+    virtual void struct_begin() = 0;
+    virtual void struct_serialize_field(const char * name, const Serialize & accessor) = 0;
+    virtual void struct_skip_field(const char * name) = 0;
+    virtual void struct_end() = 0;
 };
 
 }  // namespace ser

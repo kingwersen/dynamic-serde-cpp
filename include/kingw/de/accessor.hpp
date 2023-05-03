@@ -106,7 +106,7 @@ public:
     explicit StdVectorVisitor(std::vector<T> & output) : output(output) { }
 
     /// @brief Explanation of what this Visitor is expecting
-    /// @return Explanation of what this Visitor is expecting
+    /// @return A string literal
     const char* expecting() const override { return "a sequence of items"; }
     
     /// @brief Extract items from `seq` and put them into `output`
@@ -169,7 +169,7 @@ public:
     explicit StdMapVisitor(std::map<K, V> & output) : output(output) { }
 
     /// @brief Explanation of what this Visitor is expecting
-    /// @return Explanation of what this Visitor is expecting
+    /// @return A string literal
     const char* expecting() const override { return "a map of items"; }
 
     /// @brief Extract items from `map` and put them into `output`

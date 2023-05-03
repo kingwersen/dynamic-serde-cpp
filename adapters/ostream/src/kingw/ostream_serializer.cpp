@@ -58,15 +58,15 @@ void OStreamSerializer::serialize_string(const std::string & value) {
 /// Sequences 
 ///
 
-void OStreamSerializer::serialize_seq_begin() {
+void OStreamSerializer::seq_begin() {
     // No-op
 }
 
-void OStreamSerializer::serialize_seq_element(const ser::Serialize & accessor) {
-    accessor.serialize(*this);
+void OStreamSerializer::seq_serialize_element(const ser::Serialize & element) {
+    element.serialize(*this);
 }
 
-void OStreamSerializer::serialize_seq_end() {
+void OStreamSerializer::seq_end() {
     // No-op
 }
 
@@ -75,19 +75,24 @@ void OStreamSerializer::serialize_seq_end() {
 /// Maps 
 ///
 
-void OStreamSerializer::serialize_map_begin() {
+void OStreamSerializer::map_begin() {
     // No-op
 }
 
-void OStreamSerializer::serialize_map_key(const ser::Serialize & accessor) {
-    accessor.serialize(*this);
+void OStreamSerializer::map_serialize_key(const ser::Serialize & key) {
+    key.serialize(*this);
 }
 
-void OStreamSerializer::serialize_map_value(const ser::Serialize & accessor) {
-    accessor.serialize(*this);
+void OStreamSerializer::map_serialize_value(const ser::Serialize & value) {
+    value.serialize(*this);
 }
 
-void OStreamSerializer::serialize_map_end() {
+void OStreamSerializer::map_serialize_entry(const ser::Serialize & key, const ser::Serialize & value) {
+    map_serialize_key(key);
+    map_serialize_value(value);
+}
+
+void OStreamSerializer::map_end() {
     // No-op
 }
 
@@ -96,16 +101,20 @@ void OStreamSerializer::serialize_map_end() {
 /// Structs 
 ///
 
-void OStreamSerializer::serialize_struct_begin() {
+void OStreamSerializer::struct_begin() {
     // No-op
 }
 
-void OStreamSerializer::serialize_struct_field(const ser::Serialize & accessor, const char * name) {
+void OStreamSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
     serialize_c_str(name);
-    accessor.serialize(*this);
+    field.serialize(*this);
 }
 
-void OStreamSerializer::serialize_struct_end() {
+void OStreamSerializer::struct_skip_field(const char * name) {
+    // No-op
+}
+
+void OStreamSerializer::struct_end() {
     // No-op
 }
 

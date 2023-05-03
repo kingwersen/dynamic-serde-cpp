@@ -74,13 +74,13 @@ void JsonSerializer::serialize_string(const std::string & value) {
 /// Sequences 
 ///
 
-void JsonSerializer::serialize_seq_begin() {
+void JsonSerializer::seq_begin() {
     // No-op. Assume previous serialize calls already
     // gave us a nlohmann::json object to work with
     // at the top of the stack.
 }
 
-void JsonSerializer::serialize_seq_element(const ser::Serialize & accessor) {
+void JsonSerializer::seq_serialize_element(const ser::Serialize & accessor) {
     json_stack.push({});
     accessor.serialize(*this);
     if (json_stack.size() < 2) {
@@ -93,7 +93,7 @@ void JsonSerializer::serialize_seq_element(const ser::Serialize & accessor) {
     json_stack.top() += std::move(json);
 }
 
-void JsonSerializer::serialize_seq_end() {
+void JsonSerializer::seq_end() {
     // No-op
 }
 
@@ -102,13 +102,13 @@ void JsonSerializer::serialize_seq_end() {
 /// Maps 
 ///
 
-void JsonSerializer::serialize_map_begin() {
+void JsonSerializer::map_begin() {
     // No-op. Assume previous serialize calls already
     // gave us a nlohmann::json object to work with
     // at the top of the stack.
 }
 
-void JsonSerializer::serialize_map_key(const ser::Serialize & accessor) {
+void JsonSerializer::map_serialize_key(const ser::Serialize & accessor) {
     if (!accessor.traits().is_string) {
         throw JsonSerializationException("JsonSerializer map key is not a string");
     }
@@ -117,7 +117,7 @@ void JsonSerializer::serialize_map_key(const ser::Serialize & accessor) {
     current_map_key = kingw::OStreamSerializer::to_string(accessor);
 }
 
-void JsonSerializer::serialize_map_value(const ser::Serialize & accessor) {
+void JsonSerializer::map_serialize_value(const ser::Serialize & accessor) {
     // Add a new nlohmann::json object to the top of the stack.
     // accessor.serialize() will update it recursively.
     std::string name = std::move(current_map_key);
@@ -133,7 +133,12 @@ void JsonSerializer::serialize_map_value(const ser::Serialize & accessor) {
     json_stack.top()[std::move(name)] = std::move(value);
 }
 
-void JsonSerializer::serialize_map_end() {
+void JsonSerializer::map_serialize_entry(const ser::Serialize & key, const ser::Serialize & value) {
+    map_serialize_key(key);
+    map_serialize_value(value);
+}
+
+void JsonSerializer::map_end() {
     // No-op
 }
 
@@ -142,13 +147,13 @@ void JsonSerializer::serialize_map_end() {
 /// Structs 
 ///
 
-void JsonSerializer::serialize_struct_begin() {
+void JsonSerializer::struct_begin() {
     // No-op. Assume previous serialize calls already 
     // gave us a nlohmann::json object to work with
     // at the top of the stack.
 }
 
-void JsonSerializer::serialize_struct_field(const ser::Serialize & accessor, const char * name) {
+void JsonSerializer::struct_serialize_field(const char * name, const ser::Serialize & accessor) {
     // Add a new nlohmann::json object to the top of the stack.
     // accessor.serialize() will update it recursively.
     json_stack.push({});
@@ -163,7 +168,11 @@ void JsonSerializer::serialize_struct_field(const ser::Serialize & accessor, con
     json_stack.top()[name] = std::move(field);
 }
 
-void JsonSerializer::serialize_struct_end() {
+void JsonSerializer::struct_skip_field(const char * name) {
+    // No-op
+}
+
+void JsonSerializer::struct_end() {
     // No-op
 }
 

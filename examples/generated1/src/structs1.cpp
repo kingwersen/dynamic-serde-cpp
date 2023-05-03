@@ -7,8 +7,9 @@ using namespace kingw;
 
 template <>
 void kingw::ser::serialize<MyStruct>(ser::Serializer & serializer, const MyStruct & value) {
-    serializer.serialize_struct()
-        .with_field(ser::accessor(value.value1), "value1")
-        .with_field(ser::accessor(value.value2), "value2")
-        .with_field(ser::accessor(value.s), "s");
+    auto state = serializer.serialize_struct();
+    state.serialize_field("value1", ser::accessor(value.value1));
+    state.serialize_field("value2", ser::accessor(value.value2));
+    state.serialize_field("s", ser::accessor(value.s));
+    state.end();
 }

@@ -61,14 +61,14 @@ void XmlSerializer::serialize_string(const std::string & value) {
 /// Sequences 
 ///
 
-void XmlSerializer::serialize_seq_begin() {
+void XmlSerializer::seq_begin() {
 }
-void XmlSerializer::serialize_seq_element(const ser::Serialize & accessor) {
+void XmlSerializer::seq_serialize_element(const ser::Serialize & element) {
     stream << "<element>";
-    accessor.serialize(*this);
+    element.serialize(*this);
     stream << "</element>";
 }
-void XmlSerializer::serialize_seq_end() {
+void XmlSerializer::seq_end() {
 }
 
 
@@ -76,20 +76,24 @@ void XmlSerializer::serialize_seq_end() {
 /// Maps 
 ///
 
-void XmlSerializer::serialize_map_begin() {
+void XmlSerializer::map_begin() {
 }
-void XmlSerializer::serialize_map_key(const ser::Serialize & accessor) {
-    if (!accessor.traits().is_string) {
+void XmlSerializer::map_serialize_key(const ser::Serialize & key) {
+    if (!key.traits().is_string) {
         throw SerializationException("XmlSerializer map key is not a string");
     }
-    auto tag = XmlSerializer::to_string(accessor);
+    auto tag = XmlSerializer::to_string(key);
     stream << "<" << tag << ">";
     open_tags.push(std::move(tag));
 }
-void XmlSerializer::serialize_map_value(const ser::Serialize & accessor) {
-    accessor.serialize(*this);
+void XmlSerializer::map_serialize_value(const ser::Serialize & value) {
+    value.serialize(*this);
 }
-void XmlSerializer::serialize_map_end() {
+void XmlSerializer::map_serialize_entry(const ser::Serialize & key, const ser::Serialize & value) {
+    map_serialize_key(key);
+    map_serialize_value(value);
+}
+void XmlSerializer::map_end() {
     stream << "</" << open_tags.top() << ">";
     open_tags.pop();
 }
@@ -99,18 +103,21 @@ void XmlSerializer::serialize_map_end() {
 /// Structs 
 ///
 
-void XmlSerializer::serialize_struct_begin() {
+void XmlSerializer::struct_begin() {
 }
-void XmlSerializer::serialize_struct_field(const ser::Serialize & accessor, const char * name) {
+void XmlSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
     stream << "<";
     serialize_c_str(name);
     stream << ">";
-    accessor.serialize(*this);
+    field.serialize(*this);
     stream << "</";
     serialize_c_str(name);
     stream << ">";
 }
-void XmlSerializer::serialize_struct_end() {
+void XmlSerializer::struct_skip_field(const char * name) {
+    // No-op
+}
+void XmlSerializer::struct_end() {
 }
 
 }  // namespace kingw

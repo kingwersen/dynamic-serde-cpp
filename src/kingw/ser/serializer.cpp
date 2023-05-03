@@ -7,66 +7,80 @@ namespace ser {
 SerializationException::SerializationException(const std::string & message)
     : std::runtime_error(message) { }
 
-Serializer::Seq Serializer::serialize_seq() {
-    return Seq{ *this };
+Serializer::SerializeSeq Serializer::serialize_seq() {
+    return SerializeSeq{ *this };
 }
-Serializer::Seq::Seq(Serializer & serializer) : serializer(serializer) {
-    serializer.serialize_seq_begin();
+Serializer::SerializeSeq::SerializeSeq(Serializer & serializer) : serializer(serializer) {
+    serializer.seq_begin();
 }
-Serializer::Seq::~Seq() {
-    done();
+Serializer::SerializeSeq::~SerializeSeq() {
+    end();
 }
-Serializer::Seq & Serializer::Seq::with_element(const Serialize & accessor) {
-    serializer.serialize_seq_element(accessor);
-    return *this;
-}
-void Serializer::Seq::done() {
+void Serializer::SerializeSeq::serialize_element(const Serialize & accessor) {
     if (!closed) {
-        serializer.serialize_seq_end();
+        serializer.seq_serialize_element(accessor);
+    }
+}
+void Serializer::SerializeSeq::end() {
+    if (!closed) {
+        serializer.seq_end();
         closed = true;
     }
 }
 
-Serializer::Map Serializer::serialize_map() {
-    return Map{ *this };
+Serializer::SerializeMap Serializer::serialize_map() {
+    return SerializeMap{ *this };
 }
-Serializer::Map::Map(Serializer & serializer) : serializer(serializer) {
-    serializer.serialize_map_begin();
+Serializer::SerializeMap::SerializeMap(Serializer & serializer) : serializer(serializer) {
+    serializer.map_begin();
 }
-Serializer::Map::~Map() {
-    done();
+Serializer::SerializeMap::~SerializeMap() {
+    end();
 }
-Serializer::Map & Serializer::Map::with_key(const Serialize & accessor) {
-    serializer.serialize_map_key(accessor);
-    return *this;
-}
-Serializer::Map & Serializer::Map::with_value(const Serialize & accessor) {
-    serializer.serialize_map_value(accessor);
-    return *this;
-}
-void Serializer::Map::done() {
+void Serializer::SerializeMap::serialize_key(const Serialize & key) {
     if (!closed) {
-        serializer.serialize_map_end();
+        serializer.map_serialize_key(key);
+    }
+}
+void Serializer::SerializeMap::serialize_value(const Serialize & value) {
+    if (!closed) {
+        serializer.map_serialize_value(value);
+    }
+}
+void Serializer::SerializeMap::serialize_entry(const Serialize & key, const Serialize & value) {
+    if (!closed) {
+        serializer.map_serialize_entry(key, value);
+    }
+}
+void Serializer::SerializeMap::end() {
+    if (!closed) {
+        serializer.map_end();
         closed = true;
     }
 }
 
-Serializer::Struct Serializer::serialize_struct() {
-    return Struct{ *this };
+Serializer::SerializeStruct Serializer::serialize_struct() {
+    return SerializeStruct{ *this };
 }
-Serializer::Struct::Struct(Serializer & serializer) : serializer(serializer) {
-    serializer.serialize_struct_begin();
+Serializer::SerializeStruct::SerializeStruct(Serializer & serializer) : serializer(serializer) {
+    serializer.struct_begin();
 }
-Serializer::Struct::~Struct() {
-    done();
+Serializer::SerializeStruct::~SerializeStruct() {
+    end();
 }
-Serializer::Struct & Serializer::Struct::with_field(const Serialize & accessor, const char * name) {
-    serializer.serialize_struct_field(accessor, name);
-    return *this;
-}
-void Serializer::Struct::done() {
+void Serializer::SerializeStruct::serialize_field(const char * name, const Serialize & accessor) {
     if (!closed) {
-        serializer.serialize_struct_end();
+        serializer.struct_serialize_field(name, accessor);
+    }
+}
+void Serializer::SerializeStruct::skip_field(const char * name) {
+    if (!closed) {
+        serializer.struct_skip_field(name);
+    }
+}
+void Serializer::SerializeStruct::end() {
+    if (!closed) {
+        serializer.struct_end();
         closed = true;
     }
 }

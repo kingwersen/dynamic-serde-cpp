@@ -52,22 +52,24 @@ public:
 protected:
     // Lists/Sequences
     // Use serialize_seq() instead.
-    void serialize_seq_begin() override;
-    void serialize_seq_element(const ser::Serialize & accessor) override;
-    void serialize_seq_end() override;
+    void seq_begin() override;
+    void seq_serialize_element(const ser::Serialize & element) override;
+    void seq_end() override;
 
     // Maps
     // Use serialize_map() instead.
-    void serialize_map_begin() override;
-    void serialize_map_key(const ser::Serialize & accessor) override;
-    void serialize_map_value(const ser::Serialize & accessor) override;
-    void serialize_map_end() override;
+    void map_begin() override;
+    void map_serialize_key(const ser::Serialize & key) override;
+    void map_serialize_value(const ser::Serialize & value) override;
+    void map_serialize_entry(const ser::Serialize & key, const ser::Serialize & value) override;
+    void map_end() override;
 
     // Structs
     // Use serialize_struct() instead.
-    void serialize_struct_begin() override;
-    void serialize_struct_field(const ser::Serialize & accessor, const char * name) override;
-    void serialize_struct_end() override;
+    void struct_begin() override;
+    void struct_serialize_field(const char * name, const ser::Serialize & accessor) override;
+    void struct_skip_field(const char * name) override;
+    void struct_end() override;
 
 private:
     std::ostream & stream;

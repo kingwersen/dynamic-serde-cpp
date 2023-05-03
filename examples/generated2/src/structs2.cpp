@@ -7,6 +7,7 @@ using namespace kingw;
 
 template <>
 void kingw::ser::serialize<MyStruct2>(ser::Serializer & serializer, const MyStruct2 & value) {
-    serializer.serialize_struct()
-        .with_field(ser::accessor(value.contents), "contents");
+    auto state = serializer.serialize_struct();
+    state.serialize_field("contents", ser::accessor(value.contents));
+    state.end();
 }
