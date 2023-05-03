@@ -30,16 +30,16 @@ struct ExampleStruct {
 
 #include "structs.hpp"
 
-#include <kingw/serde/serialize.hpp>
-#include <kingw/serde/accessor.hpp>
+#include <kingw/serde/serializer.hpp>
 using namespace kingw;
 
 template <>
 void kingw::ser::serialize<ExampleStruct>(ser::Serializer & serializer, const ExampleStruct & value) {
-    serializer.serialize_struct()
-        .with_field(ser::accessor(value.name), "name")
-        .with_field(ser::accessor(value.value), "value")
-        .with_field(ser::accessor(value.items), "items");
+    auto state = serializer.serialize_struct();
+    state.serialize_field("name", ser::accessor(value.name));
+    state.serialize_field("value", ser::accessor(value.value));
+    state.serialize_field("items", ser::accessor(value.items));
+    state.end();
 }
 ```
 ```
@@ -56,7 +56,7 @@ int main() {
         { 1, 2, 3 }
     };
 
-    // Prints: {"name":"Hello, World!","value":5,"items":[1,2,3]}
+    // Prints: {"items":[1,2,3],"name":"Hello, World!","value":5}
     std::cout << kingw::JsonSerializer::to_string(data) << "\n";
     
     return 0;
