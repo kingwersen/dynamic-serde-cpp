@@ -9,15 +9,12 @@
 
 int main() {
     MyStruct data{ 1, 500.0, { { "Hello", "World!" } } };
-    std::cout << kingw::JsonSerializer::to_string(data) << "\n";
+    auto str = kingw::JsonSerializer::to_string(data);
+    std::cout << str << "\n";
     std::cout << kingw::XmlSerializer::to_string(data) << "\n";
 
-    auto data2 =  kingw::JsonDeserializer::from_string
-        <std::vector<int>>("[1,2,3,4,5]");
-    for (auto & item : data2) {
-        std::cout << item << ",";
-    }
-    std::cout << "\n";
+    MyStruct data2 = kingw::JsonDeserializer::from_string<MyStruct>(str);
+    std::cout << data2.value2 << "\n";
 
     auto data3 = kingw::JsonDeserializer::from_string
         <std::map<std::string, std::string>>("{\"Hello\":\"World!\"}");

@@ -141,6 +141,19 @@ void JsonDeserializer::deserialize_map(de::Visitor & visitor) {
         throw JsonDeserializationException("json value was not a map");
     }
 }
+void JsonDeserializer::deserialize_struct(
+    const char* name,
+    std::initializer_list<const char*> fields,
+    de::Visitor & visitor)
+{
+    auto & json = json_stack.top();
+    if (json.is_object()) {
+        JsonStructAccess map(json, fields);
+        visitor.visit_map(map);
+    } else {
+        throw JsonDeserializationException("json value was not a struct");
+    }
+}
 
 JsonDeserializer::JsonSeqAccess::JsonSeqAccess(nlohmann::json new_seq)
     : seq(std::move(new_seq)), iter(seq.begin()) { }
@@ -183,6 +196,35 @@ void JsonDeserializer::JsonMapAccess::next_value(de::Deserialize & value) {
     }
 }
 void JsonDeserializer::JsonMapAccess::next_entry(de::Deserialize & key, de::Deserialize & value) {
+    next_key(key);
+    next_value(value);
+}
+
+JsonDeserializer::JsonStructAccess::JsonStructAccess(nlohmann::json new_map, std::initializer_list<const char*> fields)
+    : map(std::move(new_map)), fields(fields), iter(fields.begin()) { }
+bool JsonDeserializer::JsonStructAccess::has_next() {
+    return iter != fields.end();
+}
+void JsonDeserializer::JsonStructAccess::next_key(de::Deserialize & key) {
+    if (has_next()) {
+        // TODO: Make efficient with pointers. Be careful with std::stack iterator invalidation.
+        JsonDeserializer deserializer(std::string("\"") + *iter + "\"");
+        key.deserialize(deserializer);
+    } else {
+        throw JsonDeserializationException("json end of map reached");
+    }
+}
+void JsonDeserializer::JsonStructAccess::next_value(de::Deserialize & value) {
+    if (has_next()) {
+        // TODO: Make efficient with pointers. Be careful with std::stack iterator invalidation.
+        JsonDeserializer deserializer(map[*iter]);
+        value.deserialize(deserializer);
+        ++iter;
+    } else {
+        throw JsonDeserializationException("json end of map reached");
+    }
+}
+void JsonDeserializer::JsonStructAccess::next_entry(de::Deserialize & key, de::Deserialize & value) {
     next_key(key);
     next_value(value);
 }

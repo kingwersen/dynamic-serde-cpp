@@ -96,7 +96,9 @@ public:
     virtual void deserialize_string(Visitor & visitor) = 0;
     virtual void deserialize_seq(Visitor & visitor) = 0;
     virtual void deserialize_map(Visitor & visitor) = 0;
-    //virtual void deserialize_struct(Visitor & visitor) = 0;
+    virtual void deserialize_struct(const char* name,
+        std::initializer_list<const char*> fields, 
+        Visitor & visitor) = 0;
 
     /// @brief Provides a Visitor access to each element of a sequence
     ///
