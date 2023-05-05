@@ -15,7 +15,7 @@ See [serdepp](https://github.com/injae/serdepp/tree/main) for a faster, header-o
 
 In the following example, `structs.hpp` does not include serialization. The serialization logic is contained entirely within `structs.cpp` and is independent of the serialization adapter `JsonSerializer`.
 
-If `ser::serialize<T>()` is not implemented for any type being serialized, then it will cause a linker error in the unit where the serialization is performed.
+If `serialize<T>()` is not implemented for any type being serialized, then it will cause a linker error in the unit where the serialization is performed.
 ```
 // structs.hpp
 
@@ -31,6 +31,7 @@ struct ExampleStruct {
 #include "structs.hpp"
 #include <kingw/serde/derive.hpp>
 
+// Implement serialize<>() and deserialize<>().
 DERIVE_SERDE(ExampleStruct,
     name,   object.name,
     value,  object.value,
@@ -56,3 +57,5 @@ int main() {
     return 0;
 }
 ```
+
+Similar to Rust, `DERIVE_SERDE()`, `DERIVE_SERIALIZE()`, and `DERIVE_DESERIALIZE()` macros exist for convenience. They take the name of the struct or class as the first argument, followed by a list of name:expression pairs. The name is the unique identifier, and the expression should return a reference to the field to read/write, such as `foo.bar` or `foo.getBar()`. If accessing your data fields is nontrivial, then you may need to derive [serialize](include/kingw/ser/derive.hpp) and/or [deserialize](include/kingw/de/derive.hpp) manually.
