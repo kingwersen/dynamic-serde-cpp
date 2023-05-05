@@ -15,7 +15,7 @@ See [serdepp](https://github.com/injae/serdepp/tree/main) for a faster, header-o
 
 In the following example, `structs.hpp` does not include serialization. The serialization logic is contained entirely within `structs.cpp` and is independent of the serialization adapter `JsonSerializer`.
 
-If `serialize()` is not implemented for any type being serialized, then it will cause a linker error in the unit where the serialization is performed.
+If `ser::serialize<T>()` is not implemented for any type being serialized, then it will cause a linker error in the unit where the serialization is performed.
 ```
 // structs.hpp
 
@@ -29,18 +29,12 @@ struct ExampleStruct {
 // structs.cpp
 
 #include "structs.hpp"
+#include <kingw/serde/derive.hpp>
 
-#include <kingw/serde/serializer.hpp>
-using namespace kingw;
-
-template <>
-void kingw::ser::serialize<ExampleStruct>(ser::Serializer & serializer, const ExampleStruct & value) {
-    auto state = serializer.serialize_struct();
-    state.serialize_field("name", ser::accessor(value.name));
-    state.serialize_field("value", ser::accessor(value.value));
-    state.serialize_field("items", ser::accessor(value.items));
-    state.end();
-}
+DERIVE_SERDE(ExampleStruct,
+    name,   object.name,
+    value,  object.value,
+    items,  object.items);
 ```
 ```
 // main.cpp
