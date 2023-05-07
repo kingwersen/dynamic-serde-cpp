@@ -40,7 +40,7 @@ public:
     class SerializeSeq
     {
     public:
-        SerializeSeq(Serializer & serializer);
+        explicit SerializeSeq(Serializer & serializer);
         ~SerializeSeq();
         void serialize_element(const Serialize & accessor);
         void end();
@@ -53,7 +53,7 @@ public:
     class SerializeMap
     {
     public:
-        SerializeMap(Serializer & serializer);
+        explicit SerializeMap(Serializer & serializer);
         ~SerializeMap();
         void serialize_key(const Serialize & key);
         void serialize_value(const Serialize & value);
@@ -68,7 +68,7 @@ public:
     class SerializeStruct
     {
     public:
-        SerializeStruct(Serializer & serializer);
+        explicit SerializeStruct(Serializer & serializer);
         ~SerializeStruct();
         void serialize_field(const char* name, const Serialize & accessor);
         void skip_field(const char* name);
