@@ -60,7 +60,7 @@ DERIVE_SERDE(ExampleStruct,
     items,  object.items);
 ```
 
-`main.cpp` performs the serialization of the structure into JSON. Since the Serde implemenetation for `ExampleStruct` was defined in the C++ source file and not the header file, `main.cpp` does not know how to serialize the structure. This information is instead provided by the linker after compilation. If Serde is not derived for the structure in any source file or linked library, then a linker error will be raised and the build will fail.
+`main.cpp` performs the serialization of the structure into JSON. Since the Serde implementation for `ExampleStruct` was defined in the C++ source file and not the header file, `main.cpp` does not know how to serialize the structure. This information is instead provided by the linker after compilation. If Serde is not derived for the structure in any source file or linked library, then a linker error will be raised and the build will fail.
 ```c++
 // main.cpp
 
