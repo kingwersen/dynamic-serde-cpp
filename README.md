@@ -6,7 +6,7 @@
 
 Another C++ port of the Rust (language) [Serde](https://serde.rs/) serialization and deserialization framework.
 
-Unlike other ports, **dynamic-serde-cpp** deliberately uses dynamic dispatch to decouple code compilation into separate archives/libraries for reuse and reduced compile times.
+Unlike other ports, **dynamic-serde-cpp** deliberately uses dynamic dispatch to decouple code compilation into separate archives/libraries for reuse and to improve compile times.
 
 
 ## Overview
