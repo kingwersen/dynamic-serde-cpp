@@ -31,6 +31,7 @@ target_include_directories(kingw_dynamic_serde_test
         "${CMAKE_CURRENT_SOURCE_DIR}")
 target_sources(kingw_dynamic_serde_test
     PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/de/test_deserialize.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/ser/test_serialize.cpp")
 target_link_libraries(kingw_dynamic_serde_test
     PRIVATE
