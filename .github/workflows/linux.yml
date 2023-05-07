@@ -53,7 +53,7 @@ jobs:
       # The $(find ..) step removes dependencies from the report, including GoogleTest.
       run: |
         mkdir -p ${{env.GCOV_REPORT_DIR}} && cd ${{env.GCOV_REPORT_DIR}} \
-          && gcov \$(find ${{github.workspace}}/build -path */_deps/* -prune -o -name *.o) \
+          && gcov $(find ${{github.workspace}}/build -path */_deps/* -prune -o -name *.o) \
             --preserve-paths --source-prefix ${{github.workspace}}
 
     - name: Run sonar-scanner
