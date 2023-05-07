@@ -38,8 +38,9 @@ jobs:
       # Build the library with the given configuration.
       # Wrap in Sonar build-wrapper for analysis later.
       run: |
-        build-wrapper-linux-x86-64 --out-dir ${{env.BUILD_WRAPPER_OUT_DIR}} \
-          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        mkdir -p ${{env.BUILD_WRAPPER_OUT_DIR}} \
+          && build-wrapper-linux-x86-64 --out-dir ${{env.BUILD_WRAPPER_OUT_DIR}} \
+            cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Test
       working-directory: ${{github.workspace}}/build
