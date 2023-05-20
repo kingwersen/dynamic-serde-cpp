@@ -3,8 +3,10 @@
 #include <gmock/gmock.h>
 
 #include "kingw/mock/de/mock_deserializer.hpp"
+#include "kingw/de/integral_visitors.hpp"
 
 using namespace kingw::de;
+using namespace testing;
 
 
 namespace {
@@ -37,143 +39,143 @@ TEST(KingwSerde, VisitorNotImplemented) {
     EXPECT_THROW(visitor.visit_map(mock_map_access), Visitor::NotImplementedException);
 }
 
-/// deserialize<bool>(deserializer, value) will invoke deserializer.deserialize_bool(value)
+/// deserialize<bool>(deserializer, value) will invoke deserializer.deserialize_bool(BoolVisitor)
 ///
 TEST(KingwSerde, DeserializeBool) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_bool)
+    EXPECT_CALL(mock_deserializer, deserialize_bool(WhenDynamicCastTo<const BoolVisitor&>(_)))
         .Times(1);
 
     bool data = false;
     deserialize<bool>(mock_deserializer, data);
 }
 
-/// deserialize<std::int8_t>(deserializer, value) will invoke deserializer.deserialize_i8(value)
+/// deserialize<std::int8_t>(deserializer, value) will invoke deserializer.deserialize_i8(I8Visitor)
 ///
 TEST(KingwSerde, DeserializeI8) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_i8)
+    EXPECT_CALL(mock_deserializer, deserialize_i8(WhenDynamicCastTo<const I8Visitor&>(_)))
         .Times(1);
 
     std::int8_t data = 0;
     deserialize<std::int8_t>(mock_deserializer, data);
 }
 
-/// deserialize<std::int16_t>(deserializer, value) will invoke deserializer.deserialize_i16(value)
+/// deserialize<std::int16_t>(deserializer, value) will invoke deserializer.deserialize_i16(I16Visitor)
 ///
 TEST(KingwSerde, DeserializeI16) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_i16)
+    EXPECT_CALL(mock_deserializer, deserialize_i16(WhenDynamicCastTo<const I16Visitor&>(_)))
         .Times(1);
 
     std::int16_t data = 0;
     deserialize<std::int16_t>(mock_deserializer, data);
 }
 
-/// deserialize<std::int32_t>(deserializer, value) will invoke deserializer.deserialize_i32(value)
+/// deserialize<std::int32_t>(deserializer, value) will invoke deserializer.deserialize_i32(I32Visitor)
 ///
 TEST(KingwSerde, DeserializeI32) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_i32)
+    EXPECT_CALL(mock_deserializer, deserialize_i32(WhenDynamicCastTo<const I32Visitor&>(_)))
         .Times(1);
 
     std::int32_t data = 0;
     deserialize<std::int32_t>(mock_deserializer, data);
 }
 
-/// deserialize<std::int64_t>(deserializer, value) will invoke deserializer.deserialize_i64(value)
+/// deserialize<std::int64_t>(deserializer, value) will invoke deserializer.deserialize_i64(I64Visitor)
 ///
 TEST(KingwSerde, DeserializeI64) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_i64)
+    EXPECT_CALL(mock_deserializer, deserialize_i64(WhenDynamicCastTo<const I64Visitor&>(_)))
         .Times(1);
 
     std::int64_t data = 0;
     deserialize<std::int64_t>(mock_deserializer, data);
 }
 
-/// deserialize<std::uint8_t>(deserializer, value) will invoke deserializer.deserialize_u8(value)
+/// deserialize<std::uint8_t>(deserializer, value) will invoke deserializer.deserialize_u8(U8Visitor)
 ///
 TEST(KingwSerde, DeserializeU8) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_u8)
+    EXPECT_CALL(mock_deserializer, deserialize_u8(WhenDynamicCastTo<const U8Visitor&>(_)))
         .Times(1);
 
     std::uint8_t data = 0;
     deserialize<std::uint8_t>(mock_deserializer, data);
 }
 
-/// deserialize<std::uint16_t>(deserializer, value) will invoke deserializer.deserialize_u16(value)
+/// deserialize<std::uint16_t>(deserializer, value) will invoke deserializer.deserialize_u16(U16Visitor)
 ///
 TEST(KingwSerde, DeserializeU16) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_u16)
+    EXPECT_CALL(mock_deserializer, deserialize_u16(WhenDynamicCastTo<const U16Visitor&>(_)))
         .Times(1);
 
     std::uint16_t data = 0;
     deserialize<std::uint16_t>(mock_deserializer, data);
 }
 
-/// deserialize<std::uint32_t>(deserializer, value) will invoke deserializer.deserialize_u32(value)
+/// deserialize<std::uint32_t>(deserializer, value) will invoke deserializer.deserialize_u32(U32Visitor)
 ///
 TEST(KingwSerde, DeserializeU32) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_u32)
+    EXPECT_CALL(mock_deserializer, deserialize_u32(WhenDynamicCastTo<const U32Visitor&>(_)))
         .Times(1);
 
     std::uint32_t data = 0;
     deserialize<std::uint32_t>(mock_deserializer, data);
 }
 
-/// deserialize<std::uint64_t>(deserializer, value) will invoke deserializer.deserialize_u64(value)
+/// deserialize<std::uint64_t>(deserializer, value) will invoke deserializer.deserialize_u64(U64Visitor)
 ///
 TEST(KingwSerde, DeserializeU64) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_u64)
+    EXPECT_CALL(mock_deserializer, deserialize_u64(WhenDynamicCastTo<const U64Visitor&>(_)))
         .Times(1);
 
     std::uint64_t data = 0;
     deserialize<std::uint64_t>(mock_deserializer, data);
 }
 
-/// deserialize<float>(deserializer, value) will invoke deserializer.deserialize_f32(value)
+/// deserialize<float>(deserializer, value) will invoke deserializer.deserialize_f32(F32Visitor)
 ///
 TEST(KingwSerde, DeserializeF32) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_f32)
+    EXPECT_CALL(mock_deserializer, deserialize_f32(WhenDynamicCastTo<const F32Visitor&>(_)))
         .Times(1);
 
     float data = 0.0;
     deserialize<float>(mock_deserializer, data);
 }
 
-/// deserialize<double>(deserializer, value) will invoke deserializer.deserialize_f64(value)
+/// deserialize<double>(deserializer, value) will invoke deserializer.deserialize_f64(F64Visitor)
 ///
 TEST(KingwSerde, DeserializeF64) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_f64)
+    EXPECT_CALL(mock_deserializer, deserialize_f64(WhenDynamicCastTo<const F64Visitor&>(_)))
         .Times(1);
 
     double data = 0.0;
     deserialize<double>(mock_deserializer, data);
 }
 
-/// deserialize<char>(deserializer, value) will invoke deserializer.deserialize_char(value)
+/// deserialize<char>(deserializer, value) will invoke deserializer.deserialize_char(CharVisitor)
 ///
 TEST(KingwSerde, DeserializeChar) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_char)
+    EXPECT_CALL(mock_deserializer, deserialize_char(WhenDynamicCastTo<const CharVisitor&>(_)))
         .Times(1);
 
     char data = '\0';
     deserialize<char>(mock_deserializer, data);
 }
 
-/// deserialize<char>(deserializer, value) will invoke deserializer.deserialize_char(value)
+/// deserialize<std::string>(deserializer, value) will invoke deserializer.deserialize_string(StringVisitor)
 ///
 TEST(KingwSerde, DeserializeString) {
     MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_string)
+    EXPECT_CALL(mock_deserializer, deserialize_string(WhenDynamicCastTo<const StringVisitor&>(_)))
         .Times(1);
 
     std::string data;

@@ -1,115 +1,73 @@
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "kingw/mock/de/mock_deserializer.hpp"
+#include "kingw/de/integral_visitors.hpp"
 
 using namespace kingw::de;
 using namespace testing;  // GMock, for testing::Ref, testing::_, etc.
 
 
 TEST(KingwSerde, BoolVisitorValid) {
-    MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_bool)
-        .Times(2)
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_bool(true); } ]))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_bool(false); } ]));
-
     bool output = false;
-    EXPECT_NO_THROW(deserialize<bool>(mock_deserializer, output));
+    BoolVisitor visitor(output);
+
+    EXPECT_NO_THROW(visitor.visit_bool(true));
     EXPECT_EQ(output, true);
-    EXPECT_NO_THROW(deserialize<bool>(mock_deserializer, output));
+    EXPECT_NO_THROW(visitor.visit_bool(false));
     EXPECT_EQ(output, false);
 }
 
 TEST(KingwSerde, BoolVisitorInvalid) {
-    MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_bool)
-        .Times(12)
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i8(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i16(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u8(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u16(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_f32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_f64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_char('\0'); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_string(""); } ));
-
     bool output = false;
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<bool>(mock_deserializer, output), Visitor::NotImplementedException);
+    BoolVisitor visitor(output);
+
+    EXPECT_THROW(visitor.visit_i8(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i16(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u8(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u16(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_f32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_f64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_char('\0'), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_string(""), Visitor::NotImplementedException);
 }
 
 TEST(KingwSerde, CharVisitorInvalid) {
-    MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_char)
-        .Times(11)
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_bool(false); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i8(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i16(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u8(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u16(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_f32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_f64(0); } ));
-
     char output = '\0';
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<char>(mock_deserializer, output), Visitor::NotImplementedException);
+    CharVisitor visitor(output);
+
+    EXPECT_THROW(visitor.visit_bool(false), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i8(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i16(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u8(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u16(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_f32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_f64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_string(""), DeserializationException);
+    EXPECT_THROW(visitor.visit_string("ab"), DeserializationException);
+    EXPECT_THROW(visitor.visit_string("hello"), DeserializationException);
 }
 
 TEST(KingwSerde, StringVisitorInvalid) {
-    MockDeserializer mock_deserializer;
-    EXPECT_CALL(mock_deserializer, deserialize_string)
-        .Times(11)
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_bool(false); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i8(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i16(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_i64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u8(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u16(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_u64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_f32(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_f64(0); } ))
-        .WillOnce(Invoke([] (Visitor & visitor) { visitor.visit_char('\0'); } ));
-
     std::string output;
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
-    EXPECT_THROW(deserialize<std::string>(mock_deserializer, output), Visitor::NotImplementedException);
+    StringVisitor visitor(output);
+
+    EXPECT_THROW(visitor.visit_bool(false), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i8(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i16(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_i64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u8(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u16(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_u64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_f32(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_f64(0), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_char('\0'), Visitor::NotImplementedException);
 }
