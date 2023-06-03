@@ -18,7 +18,7 @@ TEST(KingwSerde, SerializeSeq) {
     MockSerialize mock_serialize2;
     MockSerialize mock_serialize3;
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, seq_begin()).Times(1);
+    EXPECT_CALL(mock_serializer, seq_begin(_)).Times(1);
     EXPECT_CALL(mock_serializer, seq_serialize_element(Ref(mock_serialize1))).Times(1);
     EXPECT_CALL(mock_serializer, seq_serialize_element(Ref(mock_serialize2))).Times(1);
     EXPECT_CALL(mock_serializer, seq_serialize_element(Ref(mock_serialize3))).Times(1);
@@ -54,7 +54,7 @@ TEST(KingwSerde, SerializeMap) {
     MockSerialize mock_serialize7;
     MockSerialize mock_serialize8;
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, map_begin()).Times(1);
+    EXPECT_CALL(mock_serializer, map_begin(_)).Times(1);
     EXPECT_CALL(mock_serializer, map_serialize_key(Ref(mock_serialize1))).Times(1);
     EXPECT_CALL(mock_serializer, map_serialize_value(Ref(mock_serialize2))).Times(1);
     EXPECT_CALL(mock_serializer, map_serialize_entry(Ref(mock_serialize3), Ref(mock_serialize4))).Times(1);
@@ -93,14 +93,14 @@ TEST(KingwSerde, SerializeStruct) {
     MockSerialize mock_serialize1;
     MockSerialize mock_serialize2;
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, struct_begin()).Times(1);
+    EXPECT_CALL(mock_serializer, struct_begin(_, _)).Times(1);
     EXPECT_CALL(mock_serializer, struct_serialize_field(name1, Ref(mock_serialize1))).Times(1);
     EXPECT_CALL(mock_serializer, struct_serialize_field(name2, Ref(mock_serialize2))).Times(1);
     EXPECT_CALL(mock_serializer, struct_skip_field(name3)).Times(1);
     EXPECT_CALL(mock_serializer, struct_skip_field(name4)).Times(1);
     EXPECT_CALL(mock_serializer, struct_end()).Times(1);
 
-    auto state = mock_serializer.serialize_struct();
+    auto state = mock_serializer.serialize_struct("example");
     state.serialize_field(name1, mock_serialize1);
     state.serialize_field(name2, mock_serialize2);
     state.skip_field(name3);
@@ -113,7 +113,7 @@ TEST(KingwSerde, SerializeStructEnd) {
     MockSerializer mock_serializer;
     EXPECT_CALL(mock_serializer, struct_end).Times(1);
 
-    auto state = mock_serializer.serialize_struct();
+    auto state = mock_serializer.serialize_struct("example");
     state.end();
     state.end();
 }
