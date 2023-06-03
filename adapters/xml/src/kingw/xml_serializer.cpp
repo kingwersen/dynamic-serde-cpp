@@ -3,8 +3,8 @@
 
 namespace kingw {
 
-XmlSerializer::SerializationException::SerializationException(const std::string & str)
-    : std::runtime_error(str) { }
+XmlSerializer::XmlSerializationException::XmlSerializationException(const char* message)
+    : std::runtime_error(message) { }
 
 XmlSerializer::XmlSerializer(std::ostream & stream)
     : stream(stream) { }
@@ -61,7 +61,7 @@ void XmlSerializer::serialize_string(const std::string & value) {
 /// Sequences 
 ///
 
-void XmlSerializer::seq_begin() {
+void XmlSerializer::seq_begin(std::size_t len) {
 }
 void XmlSerializer::seq_serialize_element(const ser::Serialize & element) {
     stream << "<element>";
@@ -76,11 +76,11 @@ void XmlSerializer::seq_end() {
 /// Maps 
 ///
 
-void XmlSerializer::map_begin() {
+void XmlSerializer::map_begin(std::size_t len) {
 }
 void XmlSerializer::map_serialize_key(const ser::Serialize & key) {
     if (!key.traits().is_string) {
-        throw SerializationException("XmlSerializer map key is not a string");
+        throw XmlSerializationException("XmlSerializer map key is not a string");
     }
     auto tag = XmlSerializer::to_string(key);
     stream << "<" << tag << ">";
@@ -103,7 +103,7 @@ void XmlSerializer::map_end() {
 /// Structs 
 ///
 
-void XmlSerializer::struct_begin() {
+void XmlSerializer::struct_begin(const char* name, std::size_t len) {
 }
 void XmlSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
     stream << "<";

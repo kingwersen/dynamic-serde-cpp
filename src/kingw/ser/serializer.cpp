@@ -4,14 +4,14 @@
 namespace kingw {
 namespace ser {
 
-SerializationException::SerializationException(const std::string & message)
+SerializationException::SerializationException(const char* message)
     : std::runtime_error(message) { }
 
-Serializer::SerializeSeq Serializer::serialize_seq() {
-    return SerializeSeq{ *this };
+Serializer::SerializeSeq Serializer::serialize_seq(std::size_t len) {
+    return SerializeSeq{ *this,  len };
 }
-Serializer::SerializeSeq::SerializeSeq(Serializer & serializer) : serializer(serializer) {
-    serializer.seq_begin();
+Serializer::SerializeSeq::SerializeSeq(Serializer & serializer, std::size_t len) : serializer(serializer) {
+    serializer.seq_begin(len);
 }
 Serializer::SerializeSeq::~SerializeSeq() {
     end();
@@ -28,11 +28,11 @@ void Serializer::SerializeSeq::end() {
     }
 }
 
-Serializer::SerializeMap Serializer::serialize_map() {
-    return SerializeMap{ *this };
+Serializer::SerializeMap Serializer::serialize_map(std::size_t len) {
+    return SerializeMap{ *this, len };
 }
-Serializer::SerializeMap::SerializeMap(Serializer & serializer) : serializer(serializer) {
-    serializer.map_begin();
+Serializer::SerializeMap::SerializeMap(Serializer & serializer, std::size_t len) : serializer(serializer) {
+    serializer.map_begin(len);
 }
 Serializer::SerializeMap::~SerializeMap() {
     end();
@@ -59,11 +59,11 @@ void Serializer::SerializeMap::end() {
     }
 }
 
-Serializer::SerializeStruct Serializer::serialize_struct() {
-    return SerializeStruct{ *this };
+Serializer::SerializeStruct Serializer::serialize_struct(const char* name, std::size_t len) {
+    return SerializeStruct{ *this, name, len };
 }
-Serializer::SerializeStruct::SerializeStruct(Serializer & serializer) : serializer(serializer) {
-    serializer.struct_begin();
+Serializer::SerializeStruct::SerializeStruct(Serializer & serializer, const char* name, std::size_t len): serializer(serializer) {
+    serializer.struct_begin(name, len);
 }
 Serializer::SerializeStruct::~SerializeStruct() {
     end();

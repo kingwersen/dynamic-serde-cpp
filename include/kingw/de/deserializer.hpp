@@ -15,7 +15,7 @@ class DeserializationException : public std::runtime_error {
 public:
     /// @brief DeserializationException Constructor
     /// @param message Cause of the exception
-    explicit DeserializationException(const std::string & message);
+    explicit DeserializationException(const char* message);
 };
 
 // Forward-declare from later in this file
@@ -219,7 +219,7 @@ public:
     public:
         /// @brief NotImplementedException Constructor
         /// @param message Cause of the exception
-        explicit NotImplementedException(const std::string & message);
+        explicit NotImplementedException(const char* message);
     };
 
     /// @brief Visitor Destructor
@@ -275,6 +275,7 @@ public:
     virtual void visit_f32(float value);
     virtual void visit_f64(double value);
     virtual void visit_char(char value);
+    virtual void visit_c_str(const char* value, std::size_t len = -1);
     virtual void visit_string(const std::string & value);
     virtual void visit_seq(Deserializer::SeqAccess & value);
     virtual void visit_map(Deserializer::MapAccess & value);

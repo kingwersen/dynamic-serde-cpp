@@ -1,12 +1,14 @@
 #pragma once
 
+#include <cstring>
+
 #include "kingw/serde/derive_common.hpp"
 #include "kingw/de/deserializer.hpp"
 
 
 #define KINGW_SERDE_IMPLEMENT_FIELDS_LIST(name, fn) #name,
 #define KINGW_SERDE_IMPLEMENT_FIELDS_ENUM(name, fn) name,
-#define KINGW_SERDE_IMPLEMENT_FIELDS_ENUM_CMP(name, fn) if (key == #name) { object = FieldsEnum::name; } else
+#define KINGW_SERDE_IMPLEMENT_FIELDS_ENUM_CMP(name, fn) if (std::strcmp(key, #name) == 0) { object = FieldsEnum::name; } else
 #define KINGW_SERDE_IMPLEMENT_FIELDS_ACCESSORS(name, fn) auto name ## _accessor = kingw::de::accessor(fn);
 #define KINGW_SERDE_IMPLEMENT_FIELDS_SWITCH(name, fn) case FieldsEnum::name: accessor.next_value(name ## _accessor); break;
 
@@ -20,10 +22,13 @@ void kingw::de::deserialize<StructName ## FieldsEnum>(kingw::de::Deserializer & 
     struct StructName ## FieldsEnumVisitor : public kingw::de::Visitor { \
         explicit StructName ## FieldsEnumVisitor(FieldsEnum & object) : object(object) { } \
         const char * expecting() const override { return "'value1' or 'value2' or 's'"; } \
-        void visit_string(const std::string & key) override { \
+        void visit_c_str(const char* key, std::size_t len) override { \
             KINGW_SERDE_PP_MAP(KINGW_SERDE_IMPLEMENT_FIELDS_ENUM_CMP, __VA_ARGS__) { \
-                throw kingw::de::DeserializationException(std::string("unsupported key: ") + key); \
+                throw kingw::de::DeserializationException((std::string("unsupported key: ") + key).c_str()); \
             } \
+        } \
+        void visit_string(const std::string & key) override { \
+            visit_c_str(key.c_str(), key.size()); \
         } \
         FieldsEnum & object; \
     }; \

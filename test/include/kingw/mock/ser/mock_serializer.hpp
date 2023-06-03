@@ -25,15 +25,15 @@ public:
     MOCK_METHOD(void, serialize_char, (char), (override));
     MOCK_METHOD(void, serialize_c_str, (const char*), (override));
     MOCK_METHOD(void, serialize_string, (const std::string &), (override));
-    MOCK_METHOD(void, seq_begin, (), (override));
+    MOCK_METHOD(void, seq_begin, (std::size_t), (override));
     MOCK_METHOD(void, seq_serialize_element, (const Serialize &), (override));
     MOCK_METHOD(void, seq_end, (), (override));
-    MOCK_METHOD(void, map_begin, (), (override));
+    MOCK_METHOD(void, map_begin, (std::size_t), (override));
     MOCK_METHOD(void, map_serialize_key, (const Serialize &), (override));
     MOCK_METHOD(void, map_serialize_value, (const Serialize &), (override));
     MOCK_METHOD(void, map_serialize_entry, (const Serialize &, const Serialize &), (override));
     MOCK_METHOD(void, map_end, (), (override));
-    MOCK_METHOD(void, struct_begin, (), (override));
+    MOCK_METHOD(void, struct_begin, (const char *, std::size_t), (override));
     MOCK_METHOD(void, struct_serialize_field, (const char *, const Serialize &), (override));
     MOCK_METHOD(void, struct_skip_field, (const char *), (override));
     MOCK_METHOD(void, struct_end, (), (override));

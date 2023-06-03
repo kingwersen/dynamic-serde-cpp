@@ -86,12 +86,6 @@ Accessor<T> accessor(T & output) {
     return Accessor<T>(output);
 }
 
-template <class T, std::size_t N>
-void deserialize(Deserializer & deserializer, T (&output)[N]) {
-    // TODO
-    throw std::logic_error("deserialize() fpr C arrays not yet implemented");
-}
-
 /// @brief Generic Visitor class for `std::vector<T>` deserialization
 ///
 /// Used by `deserialize<std::vector<T>>()`.

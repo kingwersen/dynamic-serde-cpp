@@ -58,7 +58,7 @@ void OStreamSerializer::serialize_string(const std::string & value) {
 /// Sequences 
 ///
 
-void OStreamSerializer::seq_begin() {
+void OStreamSerializer::seq_begin(std::size_t len) {
     // No-op
 }
 
@@ -75,7 +75,7 @@ void OStreamSerializer::seq_end() {
 /// Maps 
 ///
 
-void OStreamSerializer::map_begin() {
+void OStreamSerializer::map_begin(std::size_t len) {
     // No-op
 }
 
@@ -101,7 +101,7 @@ void OStreamSerializer::map_end() {
 /// Structs 
 ///
 
-void OStreamSerializer::struct_begin() {
+void OStreamSerializer::struct_begin(const char* name, std::size_t len) {
     // No-op
 }
 

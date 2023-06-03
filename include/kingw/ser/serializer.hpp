@@ -12,12 +12,14 @@ namespace ser {
 
 class SerializationException : public std::runtime_error {
 public:
-    explicit SerializationException(const std::string & message);
+    explicit SerializationException(const char* message);
 };
 
 class Serializer
 {
 public:
+    constexpr static std::size_t UNKNOWN_LENGTH = -1;
+
     virtual ~Serializer() = default;
     virtual bool is_human_readable() const = 0;
 
@@ -40,7 +42,7 @@ public:
     class SerializeSeq
     {
     public:
-        explicit SerializeSeq(Serializer & serializer);
+        SerializeSeq(Serializer & serializer, std::size_t len);
         ~SerializeSeq();
         void serialize_element(const Serialize & accessor);
         void end();
@@ -48,12 +50,12 @@ public:
         Serializer & serializer;
         bool closed = false;
     };
-    virtual SerializeSeq serialize_seq();
+    virtual SerializeSeq serialize_seq(std::size_t len = UNKNOWN_LENGTH);
 
     class SerializeMap
     {
     public:
-        explicit SerializeMap(Serializer & serializer);
+        SerializeMap(Serializer & serializer, std::size_t len);
         ~SerializeMap();
         void serialize_key(const Serialize & key);
         void serialize_value(const Serialize & value);
@@ -63,12 +65,12 @@ public:
         Serializer & serializer;
         bool closed = false;
     };
-    virtual SerializeMap serialize_map();
+    virtual SerializeMap serialize_map(std::size_t len = UNKNOWN_LENGTH);
 
     class SerializeStruct
     {
     public:
-        explicit SerializeStruct(Serializer & serializer);
+        SerializeStruct(Serializer & serializer, const char* name, std::size_t len);
         ~SerializeStruct();
         void serialize_field(const char* name, const Serialize & accessor);
         void skip_field(const char* name);
@@ -77,20 +79,20 @@ public:
         Serializer & serializer;
         bool closed = false;
     };
-    virtual SerializeStruct serialize_struct();  
+    virtual SerializeStruct serialize_struct(const char* name, std::size_t len = UNKNOWN_LENGTH);
 
 protected:
-    virtual void seq_begin() = 0;
+    virtual void seq_begin(std::size_t len) = 0;
     virtual void seq_serialize_element(const Serialize & accessor) = 0;
     virtual void seq_end() = 0;
 
-    virtual void map_begin() = 0;
+    virtual void map_begin(std::size_t len) = 0;
     virtual void map_serialize_key(const Serialize & accessor) = 0;
     virtual void map_serialize_value(const Serialize & accessor) = 0;
     virtual void map_serialize_entry(const Serialize & key, const Serialize & value) = 0;
     virtual void map_end() = 0;
 
-    virtual void struct_begin() = 0;
+    virtual void struct_begin(const char* name, std::size_t len) = 0;
     virtual void struct_serialize_field(const char * name, const Serialize & accessor) = 0;
     virtual void struct_skip_field(const char * name) = 0;
     virtual void struct_end() = 0;

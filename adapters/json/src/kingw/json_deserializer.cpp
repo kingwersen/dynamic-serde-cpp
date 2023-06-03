@@ -5,7 +5,7 @@
 
 namespace kingw {
 
-JsonDeserializer::JsonDeserializationException::JsonDeserializationException(const std::string & message)
+JsonDeserializer::JsonDeserializationException::JsonDeserializationException(const char* message)
     : de::DeserializationException(message) { }
 
 JsonDeserializer::JsonDeserializer(const nlohmann::json & contents) {

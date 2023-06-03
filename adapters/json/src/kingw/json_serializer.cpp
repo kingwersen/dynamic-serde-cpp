@@ -5,7 +5,7 @@
 
 namespace kingw {
 
-JsonSerializer::JsonSerializationException::JsonSerializationException(const std::string & message)
+JsonSerializer::JsonSerializationException::JsonSerializationException(const char* message)
     : ser::SerializationException(message) { }
 
 JsonSerializer::JsonSerializer() {
@@ -74,7 +74,7 @@ void JsonSerializer::serialize_string(const std::string & value) {
 /// Sequences 
 ///
 
-void JsonSerializer::seq_begin() {
+void JsonSerializer::seq_begin(std::size_t len) {
     // No-op. Assume previous serialize calls already
     // gave us a nlohmann::json object to work with
     // at the top of the stack.
@@ -102,7 +102,7 @@ void JsonSerializer::seq_end() {
 /// Maps 
 ///
 
-void JsonSerializer::map_begin() {
+void JsonSerializer::map_begin(std::size_t len) {
     // No-op. Assume previous serialize calls already
     // gave us a nlohmann::json object to work with
     // at the top of the stack.
@@ -147,7 +147,7 @@ void JsonSerializer::map_end() {
 /// Structs 
 ///
 
-void JsonSerializer::struct_begin() {
+void JsonSerializer::struct_begin(const char* name, std::size_t len) {
     // No-op. Assume previous serialize calls already 
     // gave us a nlohmann::json object to work with
     // at the top of the stack.

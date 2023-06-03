@@ -43,7 +43,7 @@ void serialize(Serializer & serializer, const T (&data)[N]) {
     if (std::is_same<T, char>::value) {
         serializer.serialize_c_str(data);
     } else {
-        auto seq = serializer.serialize_seq();
+        auto seq = serializer.serialize_seq(N);
         for (const auto & element : data) {
             seq.serialize_element(ser::accessor(element));
         }
@@ -53,7 +53,7 @@ void serialize(Serializer & serializer, const T (&data)[N]) {
 
 template <class T>
 void serialize(Serializer & serializer, const std::vector<T> & data) {
-    auto seq = serializer.serialize_seq();
+    auto seq = serializer.serialize_seq(data.size());
     for (const auto & element : data) {
         seq.serialize_element(ser::accessor(element));
     }
@@ -62,7 +62,7 @@ void serialize(Serializer & serializer, const std::vector<T> & data) {
 
 template <class K, class V>
 void serialize(Serializer & serializer, const std::map<K, V> & data) {
-    auto map = serializer.serialize_map();
+    auto map = serializer.serialize_map(data.size());
     for (const auto & kvp : data) {
         map.serialize_entry(ser::accessor(kvp.first), ser::accessor(kvp.second));
     }
