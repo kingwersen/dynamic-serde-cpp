@@ -271,7 +271,7 @@ public:
     explicit CharVisitor(char & output);
     const char* expecting() const override;
     void visit_char(char value) override;
-    void visit_c_str(const char* value, std::size_t value_len = -1) override;
+    void visit_c_str(const char* value, std::size_t len = -1) override;
     void visit_string(const std::string & value) override;
 };
 
@@ -286,7 +286,7 @@ public:
     std::string & output;
     explicit StringVisitor(std::string & output);
     const char* expecting() const override;
-    void visit_c_str(const char* value, std::size_t value_len = -1) override;
+    void visit_c_str(const char* value, std::size_t len = -1) override;
     void visit_string(const std::string & value) override;
 };
 
@@ -302,7 +302,7 @@ public:
     std::size_t output_len;
     explicit CStringVisitor(char* output, std::size_t output_len);
     const char* expecting() const override;
-    void visit_c_str(const char* value, std::size_t value_len = -1) override;
+    void visit_c_str(const char* value, std::size_t len = -1) override;
     void visit_string(const std::string & value) override;
 };
 

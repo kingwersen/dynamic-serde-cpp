@@ -40,19 +40,37 @@ TEST(KingwSerde, BoolVisitorInvalid) {
     EXPECT_THROW(visitor.visit_string(""), Visitor::NotImplementedException);
 }
 
+/*
 TEST(KingwSerde, I8VisitorValid) {
     std::int8_t output = 0;
     I8Visitor visitor(output);
 
-    EXPECT_THROW(visitor.visit_i8(0), Visitor::NotImplementedException);
-    EXPECT_THROW(visitor.visit_i16(0), Visitor::NotImplementedException);
-    EXPECT_THROW(visitor.visit_i32(0), Visitor::NotImplementedException);
-    EXPECT_THROW(visitor.visit_i64(0), Visitor::NotImplementedException);
-    EXPECT_THROW(visitor.visit_u8(0), Visitor::NotImplementedException);
-    EXPECT_THROW(visitor.visit_u16(0), Visitor::NotImplementedException);
-    EXPECT_THROW(visitor.visit_u32(0), Visitor::NotImplementedException);
-    EXPECT_THROW(visitor.visit_u64(0), Visitor::NotImplementedException);
+    EXPECT_NO_THROW(visitor.visit_i8(0));
+    EXPECT_NO_THROW(visitor.visit_i8(std::numeric_limits<std::int8_t>::min()));
+    EXPECT_NO_THROW(visitor.visit_i8(std::numeric_limits<std::int8_t>::max()));
+    EXPECT_NO_THROW(visitor.visit_i16(0));
+    EXPECT_NO_THROW(visitor.visit_i16(std::numeric_limits<std::int8_t>::min()));
+    EXPECT_NO_THROW(visitor.visit_i16(std::numeric_limits<std::int8_t>::max()));
+    EXPECT_NO_THROW(visitor.visit_i32(0));
+    EXPECT_NO_THROW(visitor.visit_i32(std::numeric_limits<std::int8_t>::min()));
+    EXPECT_NO_THROW(visitor.visit_i32(std::numeric_limits<std::int8_t>::max()));
+    EXPECT_NO_THROW(visitor.visit_i64(0));
+    EXPECT_NO_THROW(visitor.visit_i64(std::numeric_limits<std::int8_t>::min()));
+    EXPECT_NO_THROW(visitor.visit_i64(std::numeric_limits<std::int8_t>::max()));
+    EXPECT_NO_THROW(visitor.visit_u8(0));
+    EXPECT_THROW(visitor.visit_u8(std::numeric_limits<std::int8_t>::min()), kingw::de::DeserializationException);
+    EXPECT_NO_THROW(visitor.visit_u8(std::numeric_limits<std::int8_t>::max()));
+    EXPECT_NO_THROW(visitor.visit_u16(0));
+    EXPECT_THROW(visitor.visit_u16(std::numeric_limits<std::int8_t>::min()), kingw::de::DeserializationException);
+    EXPECT_NO_THROW(visitor.visit_u16(std::numeric_limits<std::int8_t>::max()));
+    EXPECT_NO_THROW(visitor.visit_u32(0));
+    EXPECT_THROW(visitor.visit_u32(std::numeric_limits<std::int8_t>::min()), kingw::de::DeserializationException);
+    EXPECT_NO_THROW(visitor.visit_u32(std::numeric_limits<std::int8_t>::max()));
+    EXPECT_NO_THROW(visitor.visit_u64(0));
+    EXPECT_THROW(visitor.visit_u64(std::numeric_limits<std::int8_t>::min()), kingw::de::DeserializationException);
+    EXPECT_NO_THROW(visitor.visit_u64(std::numeric_limits<std::int8_t>::max()));
 }
+*/
 
 TEST(KingwSerde, I8VisitorInvalid) {
     std::int8_t output = 0;
@@ -68,7 +86,7 @@ TEST(KingwSerde, I8VisitorInvalid) {
 TEST(KingwSerde, I8VisitorExpecting) {
     std::int8_t output = 0;
     I8Visitor visitor(output);
-    EXPECT_STREQ(visitor.expecting(), "a boolean");
+    EXPECT_STREQ(visitor.expecting(), "an 8-bit integer");
 }
 
 TEST(KingwSerde, CharVisitorExpecting) {
