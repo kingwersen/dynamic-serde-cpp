@@ -9,6 +9,7 @@ target_sources(kingw_dynamic_serde_example1
         "${CMAKE_CURRENT_SOURCE_DIR}/example1.cpp")
 target_link_libraries(kingw_dynamic_serde_example1
     PUBLIC
+        kingw::dynamic_serde_sprintf
         kingw::dynamic_serde_json
         kingw::dynamic_serde_xml
         kingw::ex_generated1)
