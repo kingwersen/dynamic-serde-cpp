@@ -63,8 +63,8 @@ public:
     {
     public:
         explicit JsonSeqAccess(nlohmann::json seq);
-        bool has_next();
-        void next_element(de::Deserialize & element);
+        bool has_next() override;
+        void next_element(de::Deserialize & element) override;
     private:
         nlohmann::json seq;
         decltype(seq.begin()) iter;
