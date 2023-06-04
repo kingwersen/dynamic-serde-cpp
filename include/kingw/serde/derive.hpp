@@ -56,17 +56,26 @@ struct FieldDefinition {
 
     /// @brief Helper function to serialize this field from an object
     /// @param state ser::Serializer helper class, from serialize_struct()
-    /// @param object Instance of Struct to serialize
-    void serialize(ser::Serializer::SerializeStruct & state, const Struct & object) const {
-        state.serialize_field(name, ser::accessor(get(object)));
+    /// @param input Instance of Struct to serialize
+    void serialize(ser::Serializer::SerializeStruct & state, const Struct & input) const {
+        ser::Accessor<Field> accessor(get(input));
+        state.serialize_field(name, accessor);
     }
 
     /// @brief Helper function to deserialize this field into an object
-    /// @param state de::Deserializer helper class, from deserialize_struct()
-    /// @param object Instance of Struct to deserialize
-    void deserialize(de::Deserializer::MapAccess & map, Struct & object) const {
-        de::Accessor<Field> accessor(get(object));
+    /// @param map de::Deserializer helper class, from deserialize_struct()
+    /// @param output Instance of Struct to deserialize
+    void deserialize_map(de::Deserializer::MapAccess & map, Struct & output) const {
+        de::Accessor<Field> accessor(get(output));
         map.next_value(accessor);
+    }
+
+    /// @brief Helper function to deserialize this field into an object
+    /// @param seq de::Deserializer helper class, from deserialize_struct()
+    /// @param output Instance of Struct to deserialize
+    void deserialize_seq(de::Deserializer::SeqAccess & seq, Struct & output) const {
+        de::Accessor<Field> accessor(get(output));
+        seq.next_element(accessor);
     }
 };
 
@@ -175,13 +184,20 @@ struct StructDefinition<Struct> {
     }
 
     /// @brief Recursive helper function for deserialize() to invoke for each field
-    /// @param accessor de::Deserializer helper class, from deserialize_struct()
+    /// @param map de::Deserializer helper class, from deserialize_struct()
     /// @param field_index Index of the field to apply to
-    /// @param output Instance of Struct to serialize
-    void deserialize_recurse(de::Deserializer::MapAccess & accessor, std::size_t field_index, Struct & output) const {
+    /// @param output Instance of Struct to deserialize
+    void deserialize_map_recurse(de::Deserializer::MapAccess & map, std::size_t field_index, Struct & output) const {
         // This function call is the end of the recursion chain.
         // If we haven't found the matching field by now, then it doesn't exist.
         throw de::DeserializationException("unsupported key");
+    }
+
+    /// @brief Recursive helper function for deserialize() to invoke for each field
+    /// @param seq de::Deserializer helper class, from deserialize_struct()
+    /// @param output Instance of Struct to deserialize
+    void deserialize_seq_recurse(de::Deserializer::SeqAccess & seq, Struct & output) const {
+        // No-op. Stop recursing.
     }
 
     /// @brief Helper function that recursively inputs field names into names_arr
@@ -214,6 +230,14 @@ struct StructDefinition<Struct> {
         /// @param map de::Deserializer helper object for deserializing key-value pairs
         void visit_map(de::Deserializer::MapAccess & map) override {
             if (map.has_next()) {
+                throw de::DeserializationException("expected struct with no fields");
+            }
+        }
+
+        /// @brief Interpret and deserialize a map into the output struct instance
+        /// @param seq de::Deserializer helper object for deserializing a sequence of elements
+        void visit_seq(de::Deserializer::SeqAccess & seq) override {
+            if (seq.has_next()) {
                 throw de::DeserializationException("expected struct with no fields");
             }
         }
@@ -331,14 +355,28 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     }
 
     /// @brief Recursive helper function for deserialize() to invoke for each field
-    /// @param accessor de::Deserializer helper class, from deserialize_struct()
+    /// @param map de::Deserializer helper class, from deserialize_struct()
     /// @param field_index Index of the field to apply to
-    /// @param output Instance of Struct to serialize
-    void deserialize_recurse(de::Deserializer::MapAccess & accessor, std::size_t field_index, Struct & output) const {
+    /// @param output Instance of Struct to deserialize
+    void deserialize_map_recurse(de::Deserializer::MapAccess & map, std::size_t field_index, Struct & output) const {
+        // Deserialize using the field that matches `field_index` only.
         if (field_index == field_number) {
-            field.deserialize(accessor, output);
+            field.deserialize_map(map, output);
         } else {
-            previous_fields.deserialize_recurse(accessor, field_index, output);
+            previous_fields.deserialize_map_recurse(map, field_index, output);
+        }
+    }
+
+    /// @brief Recursive helper function for deserialize() to invoke for each field
+    /// @param seq de::Deserializer helper class, from deserialize_struct()
+    /// @param output Instance of Struct to deserialize
+    void deserialize_seq_recurse(de::Deserializer::SeqAccess & seq, Struct & output) const {
+        // Recurse first - the deepest item is first.
+        previous_fields.deserialize_seq_recurse(seq, output);
+        if (seq.has_next()) {
+            field.deserialize_seq(seq, output);
+        } else {
+            throw de::DeserializationException("number of elements in sequence does not match struct fields");
         }
     }
 
@@ -384,11 +422,23 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
         /// @brief Interpret and deserialize a map into the output struct instance
         /// @param map de::Deserializer helper object for deserializing key-value pairs
         void visit_map(de::Deserializer::MapAccess & map) override {
+            // For each key-value-pair, deserialize value into the field with
+            // the matching key (field name).
             std::size_t field_index = 0;
             FieldNameAccessor visitor(defn, field_index);
             while (map.has_next()) {
-                map.next_key(visitor);  // Assign value to field_index, or 0
-                defn.deserialize_recurse(map, field_index, output);
+                map.next_key(visitor);  // Put key to field_index, or 0
+                defn.deserialize_map_recurse(map, field_index, output);
+            }
+        }
+
+        /// @brief Interpret and deserialize a sequence into the output struct instance
+        /// @param seq de::Deserializer helper object for deserializing a sequence of elements
+        void visit_seq(de::Deserializer::SeqAccess & seq) override {
+            // Deserialize each field in order. Must match exactly.
+            defn.deserialize_seq_recurse(seq, output);
+            if (seq.has_next()) {
+                throw de::DeserializationException("number of elements in sequence does not match struct fields");
             }
         }
     };
