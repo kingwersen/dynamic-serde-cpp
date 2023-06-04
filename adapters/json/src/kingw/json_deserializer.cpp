@@ -143,12 +143,12 @@ void JsonDeserializer::deserialize_map(de::Visitor & visitor) {
 }
 void JsonDeserializer::deserialize_struct(
     const char* name,
-    std::initializer_list<const char*> fields,
+    const FieldNames & field_names,
     de::Visitor & visitor)
 {
     auto & json = json_stack.top();
     if (json.is_object()) {
-        JsonStructAccess map(json, fields);
+        JsonStructAccess map(json, field_names);
         visitor.visit_map(map);
     } else {
         throw JsonDeserializationException("json value was not a struct");
@@ -200,10 +200,10 @@ void JsonDeserializer::JsonMapAccess::next_entry(de::Deserialize & key, de::Dese
     next_value(value);
 }
 
-JsonDeserializer::JsonStructAccess::JsonStructAccess(nlohmann::json new_map, std::initializer_list<const char*> fields)
-    : map(std::move(new_map)), fields(fields), iter(fields.begin()) { }
+JsonDeserializer::JsonStructAccess::JsonStructAccess(nlohmann::json new_map, const FieldNames & field_names)
+    : map(std::move(new_map)), field_names(field_names), iter(field_names.begin()) { }
 bool JsonDeserializer::JsonStructAccess::has_next() {
-    return iter != fields.end();
+    return iter != field_names.end();
 }
 void JsonDeserializer::JsonStructAccess::next_key(de::Deserialize & key) {
     if (has_next()) {

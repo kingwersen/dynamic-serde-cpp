@@ -120,7 +120,7 @@ void SPrintfDeserializer::deserialize_map(de::Visitor & visitor) {
 }
 void SPrintfDeserializer::deserialize_struct(
     const char* name,
-    std::initializer_list<const char*> fields,
+    const FieldNames & field_names,
     de::Visitor & visitor)
 {
     // TODO

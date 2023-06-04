@@ -3,4 +3,4 @@
 #include "kingw/serde/derive.hpp"
 
 DERIVE_SERDE(MyStruct2,
-    contents, object.contents);
+    ("contents", &Self::contents));

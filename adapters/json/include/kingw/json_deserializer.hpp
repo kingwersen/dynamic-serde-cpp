@@ -56,7 +56,7 @@ public:
     void deserialize_map(de::Visitor & visitor) override;
     void deserialize_struct(
         const char* name,
-        std::initializer_list<const char*> fields,
+        const FieldNames & field_names,
         de::Visitor & visitor) override;
 
     class JsonSeqAccess : public de::Deserializer::SeqAccess
@@ -87,15 +87,15 @@ public:
     class JsonStructAccess : public de::Deserializer::MapAccess
     {
     public:
-        explicit JsonStructAccess(nlohmann::json map, std::initializer_list<const char*> fields);
+        explicit JsonStructAccess(nlohmann::json map, const FieldNames & fields);
         bool has_next() override;
         void next_key(de::Deserialize & key) override;
         void next_value(de::Deserialize & value) override;
         void next_entry(de::Deserialize & key, de::Deserialize & value) override;
     private:
         nlohmann::json map;
-        std::initializer_list<const char*> fields;
-        decltype(fields.begin()) iter;
+        const FieldNames & field_names;
+        decltype(field_names.begin()) iter;
     };
 
 private:

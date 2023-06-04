@@ -48,7 +48,7 @@ public:
     void deserialize_map(de::Visitor & visitor) override;
     void deserialize_struct(
         const char* name,
-        std::initializer_list<const char*> fields,
+        const FieldNames & field_names,
         de::Visitor & visitor) override;
 
     class SPrintfSeqAccess : public de::Deserializer::SeqAccess

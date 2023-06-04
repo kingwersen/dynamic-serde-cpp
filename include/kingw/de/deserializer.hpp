@@ -43,6 +43,20 @@ class Visitor;
 class Deserializer
 {
 public:
+    struct FieldNames {
+        FieldNames(std::initializer_list<const char*> init)
+            : list(init), first(list.begin()), last(list.end()) {}
+        FieldNames(const char* const* first, const char* const* last)
+            : first(first), last(last) {}
+        const char* const* begin() const { return first; }
+        const char* const* end() const { return last; }
+
+    private:
+        std::initializer_list<const char*> list;  // maybe unused
+        const char* const* first;
+        const char* const* last;
+    };
+
     /// @brief Deserializer Destructor
     virtual ~Deserializer() = default;
 
@@ -96,8 +110,8 @@ public:
     virtual void deserialize_string(Visitor & visitor) = 0;
     virtual void deserialize_seq(Visitor & visitor) = 0;
     virtual void deserialize_map(Visitor & visitor) = 0;
-    virtual void deserialize_struct(const char* name,
-        std::initializer_list<const char*> fields, 
+    virtual void deserialize_struct(const char* struct_name,
+        const FieldNames & field_names, 
         Visitor & visitor) = 0;
 
     /// @brief Provides a Visitor access to each element of a sequence
