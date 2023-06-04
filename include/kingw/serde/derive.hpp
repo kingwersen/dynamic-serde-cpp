@@ -132,7 +132,7 @@ struct StructDefinition<Struct> {
     explicit StructDefinition(const char* name)
         : name(name) {}
 
-    /// @brief Construct a new StructDefinition with containing the provided field
+    /// @brief Construct a new StructDefinition containing the provided field
     /// @tparam NewField Type of member variable
     /// @param field_name Name/identifier of the member variable
     /// @param ptr Pointer to the member variable. @see MemberPtr<>
@@ -145,7 +145,7 @@ struct StructDefinition<Struct> {
 
     /// @brief Alias to StructDefinition<>::with_field()
     ///
-    /// Construct a new StructDefinition with containing the provided field.
+    /// Construct a new StructDefinition containing the provided field.
     /// This alias is used by DERIVE_SERDE() for syntactic sugar.
     ///
     /// @tparam NewField Type of member variable
@@ -255,6 +255,29 @@ struct StructDefinition<Struct> {
 /// "defn" in the above snippet is of type StructDefinition<Example, double, int>.
 /// Note that the template parameters are listed in reverse order.
 ///
+/// Example class and corresponding StructDefinition:
+///   struct Example {
+///       int Field1;
+///       int Field2;
+///       int Field3;
+///   };
+///
+///   StructDefinition<Example, Field3, Field2, Field1> {
+///       StructDefinition<Example, Field2, Field1> {
+///           StructDefinition<Example, Field1> {
+///               StructDefinition<Example> {
+///                   std::size_t field_number = 0;
+///               };
+///               std::size_t field_number = 1;
+///               const char* field.name = "Field1";
+///           };
+///           std::size_t field_number = 2;
+///           const char* field.name = "Field2";
+///       };
+///       std::size_t field_number = 3;
+///       const char* field.name = "Field3";
+///   };
+///
 /// @tparam Struct Type of class/struct
 /// @tparam Field Type of member variable
 /// @tparam ...PreviousFields List of previously-defined member variable types
@@ -297,7 +320,7 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     constexpr explicit StructDefinition(FieldDefinition<Struct, Field> field, StructDefinition<Struct, PreviousFields...> previous_fields)
         : field(field), previous_fields(previous_fields) {}
 
-    /// @brief Construct a new StructDefinition with containing the provided field
+    /// @brief Construct a new StructDefinition containing the provided field
     /// @tparam NewField Type of member variable
     /// @param field_name Name/identifier of the member variable
     /// @param ptr Pointer to the member variable. @see MemberPtr<>
@@ -310,7 +333,7 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
 
     /// @brief Alias to StructDefinition<>::with_field()
     ///
-    /// Construct a new StructDefinition with containing the provided field.
+    /// Construct a new StructDefinition containing the provided field.
     /// This alias is used by DERIVE_SERDE() for syntactic sugar.
     ///
     /// @tparam NewField Type of member variable
@@ -326,12 +349,19 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     /// @param serializer ser::Serializer to serialize into
     /// @param input Instance of Struct to serialize
     void serialize(ser::Serializer & serializer, const Struct & input) const {
-        ser::Serializer::SerializeStruct state = serializer.serialize_struct(struct_name(), field_number);
+        std::size_t num_fields = field_number;  // field_number is a 1-based index. This is the last field in the struct.
+        ser::Serializer::SerializeStruct state = serializer.serialize_struct(struct_name(), num_fields);
         serialize_recurse(state, input);
         state.end();
     }
 
     /// @brief Recursive helper function for serialize() to invoke for each field
+    ///
+    /// Iterate over each field, starting with the first, and serialize() from them.
+    ///   1. ser::serialize(serializer, field1)
+    ///   2. ser::serialize(serializer, field2)
+    ///   3. ser::serialize(serializer, field3)
+    ///
     /// @param state ser::Serializer helper class, from serialize_struct()
     /// @param input Instance of Struct to serialize
     void serialize_recurse(ser::Serializer::SerializeStruct & state, const Struct & input) const {
@@ -355,6 +385,18 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     }
 
     /// @brief Recursive helper function for deserialize() to invoke for each field
+    ///
+    /// This function call indicates through field_index which field should be
+    /// deserialized into. Find it and run deserialize(). This function will usually
+    /// be invoked multiple times (ideally once per field in the class/struct).
+    ///
+    /// Example operations:
+    ///   1. field_number(1) == 2 ?:no -> continue
+    ///   2. field_number(2) == 2 ?:yes -> de::deserialize(deserializer, field2)
+    ///   3. field_number(3) == 2 ?:no -> continue
+    ///
+    /// The field_index parameter is obtained by deserializing using FieldNameAccessor.
+    ///
     /// @param map de::Deserializer helper class, from deserialize_struct()
     /// @param field_index Index of the field to apply to
     /// @param output Instance of Struct to deserialize
@@ -368,6 +410,12 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     }
 
     /// @brief Recursive helper function for deserialize() to invoke for each field
+    ///
+    /// Iterate over each field, starting with the first, and deserialize() into them.
+    ///   1. de::deserialize(deserializer, field1)
+    ///   2. de::deserialize(deserializer, field2)
+    ///   3. de::deserialize(deserializer, field3)
+    ///
     /// @param seq de::Deserializer helper class, from deserialize_struct()
     /// @param output Instance of Struct to deserialize
     void deserialize_seq_recurse(de::Deserializer::SeqAccess & seq, Struct & output) const {
@@ -381,13 +429,33 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     }
 
     /// @brief Helper function that recursively inputs field names into names_arr
+    ///
+    /// Example operations:
+    ///   1. names_arr[0] = "Field1";
+    ///   2. names_arr[1] = "Field2";
+    ///   3. names_arr[2] = "Field3";
+    ///
     /// @param names_arr Existing array with at least `field_number` elements
     void field_names(const char** names_arr) const {
-        names_arr[field_number-1] = field.name;
         previous_fields.field_names(names_arr);
+        names_arr[field_number-1] = field.name;
     }
 
     /// @brief Obtain the `field_number` of the field named `field_name`, or 0
+    ///
+    /// The recursion base case in StructDefinition<Struct> returns 0.
+    /// While the return value is still 0, compare the input field name to the name
+    /// of the current field. If it matches, then return the current field number
+    /// instead of 0. Else, continue to return 0.
+    ///
+    /// If we run out of fields and the value is still 0, then the field name was not found.
+    ///
+    /// Example operations (field_name = "Field2"):
+    ///   1. result = 0
+    ///   2. result == 0 ?:yes -> field_name == "Field1" ?:no -> continue
+    ///   3. result == 0 ?:yes -> field_name == "Field2" ?:yes -> result = 2
+    ///   4. result == 0 ?:no -> continue
+    ///
     /// @param field_name Name/identifier of the field
     /// @param len Length of field_name
     /// @return A `field_number` (one-based index), or 0 if the field was not found
