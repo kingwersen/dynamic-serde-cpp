@@ -43,18 +43,57 @@ class Visitor;
 class Deserializer
 {
 public:
-    struct FieldNames {
-        FieldNames(std::initializer_list<const char*> init)
-            : list(init), first(list.begin()), last(list.end()) {}
-        FieldNames(const char* const* first, const char* const* last)
-            : first(first), last(last) {}
-        const char* const* begin() const { return first; }
-        const char* const* end() const { return last; }
+    /// @brief Helper class for listing field names for deserialize_struct()
+    ///
+    /// Deserializer::deserialize_struct() needs to take a list of field names
+    /// as a parameter. The parameter cannot be a template type because the
+    /// function is polymorphic, and I do not want to dynamically allocate memory.
+    ///
+    /// I really wanted to use std::initializer_list<const char*>,
+    /// but apparently I can't construct one to point to an existing array.
+    /// They can ONLY be constructed using the special brace syntax.
+    ///
+    /// So, this structure adds a layer of abstraction. It acts like a
+    /// standard initializer list except that it has an additional constructor
+    /// for begin and end iterators.
+    class FieldNames
+    {
+    public:
+        /// @brief Alias for an iterator to a collection of (const char*)
+        using Iterator = const char* const*;
+
+        /// @brief Initializer List Constructor (implicit)
+        /// @param init List of (const char*)
+        FieldNames(std::initializer_list<const char*> init);
+
+        /// @brief Iterator Pair Constructor
+        /// @param begin Forward iter (begin) to a collection of (const char*)
+        /// @param end Forward iter (end) to a collection of (const char*)
+        FieldNames(Iterator begin, Iterator end);
+
+        /// @brief Iterator to the beginning of the collection of field names
+        /// @return Iterator to the beginning of the collection of field names
+        Iterator begin() const;
+
+        /// @brief Iterator to the end of the collection of field names
+        /// @return Iterator to the end of the collection of field names
+        Iterator end() const;
 
     private:
+        /// @brief Copy of an initializer list (optional)
+        ///
+        /// This field only exists to extend the lifetime of the init list when
+        /// using the corresponding constructor. Users will use begin()
+        /// and end() instead and will not interact with the list itself.
+        ///
+        /// If using the Iterator pair constructor, this field will be unused.
         std::initializer_list<const char*> list;  // maybe unused
-        const char* const* first;
-        const char* const* last;
+
+        /// @brief Iterator to the first field name
+        Iterator begin_;
+
+        /// @brief Iterator to the end of the field names collection
+        Iterator end_;
     };
 
     /// @brief Deserializer Destructor

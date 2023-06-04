@@ -12,6 +12,20 @@ namespace de {
 DeserializationException::DeserializationException(const char* message)
     : std::runtime_error(message) { }
 
+Deserializer::FieldNames::FieldNames(std::initializer_list<const char*> init)
+    : list(init), begin_(list.begin()), end_(list.end()) {}
+
+Deserializer::FieldNames::FieldNames(Iterator begin, Iterator end)
+    : begin_(begin), end_(end) {}
+
+Deserializer::FieldNames::Iterator Deserializer::FieldNames::begin() const {
+    return begin_;
+}
+
+Deserializer::FieldNames::Iterator Deserializer::FieldNames::end() const {
+    return end_;
+}
+
 Visitor::NotImplementedException::NotImplementedException(const char* message)
     : DeserializationException(message) { }
 
