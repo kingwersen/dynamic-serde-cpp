@@ -43,7 +43,7 @@ struct ExampleStruct {
 };
 ```
 
-`structs.cpp` contains the implementation of Serde for `ExampleStruct`. Here, we use the `DERIVE_SERDE()` macro to simplify implementation. The first parameter of the macro refers to the name of the class or struct, and the following parameters are a list of name:expression pairs that identify the fields. The name is a unique identifier, and the expression should return a reference to the field to read/write, such as `object.foo` or `object.getFoo()` (always use `object` to refer to the object). If accessing your data fields is nontrivial, then you may need to derive [serialize](include/kingw/ser/derive.hpp) and/or [deserialize](include/kingw/de/derive.hpp) manually.
+`structs.cpp` contains the implementation of Serde for `ExampleStruct`. Here, we use the `DERIVE_SERDE()` macro to simplify implementation. The first parameter of the macro refers to the name of the class or struct, and the following parameters are a list of ("name", expression) pairs that identify the fields. The name is a unique identifier, and the expression should return a reference to the field to read/write. If accessing your data fields is nontrivial, then you may need to derive serialize and/or deserialize manually.
 
 ```c++
 // structs.cpp
@@ -55,9 +55,9 @@ struct ExampleStruct {
 // Member variables are de/serialized based on each of their types automatically,
 // provided their types also have Serde implemented.
 DERIVE_SERDE(ExampleStruct,
-    name,   object.name,
-    value,  object.value,
-    items,  object.items);
+    ("name",    &Self::name)
+    ("value",   &Self::value)
+    ("items",   &Self::items));
 ```
 
 `main.cpp` performs the serialization of the structure into JSON. Since the Serde implementation for `ExampleStruct` was defined in the C++ source file and not the header file, `main.cpp` does not know how to serialize the structure. This information is instead provided by the linker after compilation. If Serde is not derived for the structure in any source file or linked library, then a linker error will be raised and the build will fail.
