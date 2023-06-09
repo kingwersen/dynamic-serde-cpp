@@ -1,0 +1,9 @@
+# Timestamp Example
+
+Serde does not provide built-in support for timestamps. In order to serialize and deserialize timestamps in your data model, you will need to implement serialize and deserialize manually. This example demonstrates how to do that. You may extrapolate these implementation details to other higher-order data types, like telephone numbers or email addresses.
+
+The first step in defining Serde for custom types is to create a new class to hold it. You will NOT be able to simply implement Serde for an integer or a string - Serde is already implemented for these types and cannot be overridden. By wrapping your custom data type in a class, you create a unique identifier that can be used to declare that a particular data field should be serialized and deserialized using your own implementation.
+
+Within ``ser::serialize<T>()`` and ``de::deserialize<T>()``, you may wish to condition on the value of ``serializer.is_human_readable()`` and ``deserializer.is_human_readable()``. This field exists to help you decide how to serialize your data. In the Timestamp example, we choose to serialize into the human-readable string format [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) ("yyyy-mm-ddThh:mm:ss.fffZ") when ``is_human_readable()`` is true and serialize into an integer number of milliseconds since [1970-01-01 UTC](https://en.wikipedia.org/wiki/Unix_time) when not. JSON, YAML, and XML are example data formats that are human-readable; Binary and Protobuf are example data formats that are not human-readable. See the Rust Serde documentation: https://docs.rs/serde/1.0.164/serde/ser/trait.Serializer.html#method.is_human_readable
+
+This specific implementation is hastily written for the sake of demonstrating this library. You may use it of course, but be aware it is not heavily tested. You may wish to create a custom implementation using a more stable date/time implementation such as: https://github.com/HowardHinnant/date/tree/master
