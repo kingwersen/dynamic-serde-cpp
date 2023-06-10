@@ -23,7 +23,7 @@ public:
     MOCK_METHOD(void, serialize_f32, (float), (override));
     MOCK_METHOD(void, serialize_f64, (double), (override));
     MOCK_METHOD(void, serialize_char, (char), (override));
-    MOCK_METHOD(void, serialize_string, (const char*, const char*), (override));
+    MOCK_METHOD(void, serialize_string, (serde::string_view), (override));
     MOCK_METHOD(void, seq_begin, (std::size_t), (override));
     MOCK_METHOD(void, seq_serialize_element, (const Serialize &), (override));
     MOCK_METHOD(void, seq_end, (), (override));
@@ -32,9 +32,9 @@ public:
     MOCK_METHOD(void, map_serialize_value, (const Serialize &), (override));
     MOCK_METHOD(void, map_serialize_entry, (const Serialize &, const Serialize &), (override));
     MOCK_METHOD(void, map_end, (), (override));
-    MOCK_METHOD(void, struct_begin, (const char *, std::size_t), (override));
-    MOCK_METHOD(void, struct_serialize_field, (const char *, const Serialize &), (override));
-    MOCK_METHOD(void, struct_skip_field, (const char *), (override));
+    MOCK_METHOD(void, struct_begin, (serde::string_view, std::size_t), (override));
+    MOCK_METHOD(void, struct_serialize_field, (serde::string_view, const Serialize &), (override));
+    MOCK_METHOD(void, struct_skip_field, (serde::string_view), (override));
     MOCK_METHOD(void, struct_end, (), (override));
 };
 

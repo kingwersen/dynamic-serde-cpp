@@ -10,9 +10,6 @@
 namespace kingw {
 namespace ser {
 
-template <class T, std::size_t N>
-void serialize(Serializer & serializer, const T (&data)[N]);
-
 template <class T>
 void serialize(Serializer & serializer, const std::vector<T> & data);
 
@@ -36,19 +33,6 @@ private:
 template <class T>
 Accessor<T> accessor(const T & item) {
     return Accessor<T>(item);
-}
-
-template <class T, std::size_t N>
-void serialize(Serializer & serializer, const T (&data)[N]) {
-    if (std::is_same<T, char>::value) {
-        serializer.serialize_string(data, data + N);
-    } else {
-        auto seq = serializer.serialize_seq(N);
-        for (const auto & element : data) {
-            seq.serialize_element(ser::accessor(element));
-        }
-        seq.end();
-    }
 }
 
 template <class T>

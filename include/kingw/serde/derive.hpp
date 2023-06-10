@@ -29,7 +29,7 @@ using MemberPtr = Field Struct::*;
 template <class Struct, class Field>
 struct FieldDefinition {
     /// @brief Name/identifier of the field
-    const char* name;
+    serde::string_view name;
 
     /// @brief Pointer to the Field object, given a Struct object
     MemberPtr<Struct, Field> ptr;
@@ -37,7 +37,7 @@ struct FieldDefinition {
     /// @brief FieldDefinition Constructor
     /// @param name Name/identifier of the field
     /// @param ptr Pointer to the Field object, given a Struct object. @see MemberPtr<>
-    FieldDefinition(const char* name, MemberPtr<Struct, Field> ptr)
+    constexpr FieldDefinition(serde::string_view name, MemberPtr<Struct, Field> ptr)
         : name(name), ptr(ptr) {}
 
     /// @brief Helper function to get the field described by this class
@@ -109,7 +109,7 @@ struct StructDefinition<Struct> {
     /// This is ONLY defined in the base case. Recursive StructDefinition do not
     /// define the struct name. Any StructDefinition can access the base name
     /// using struct_name().
-    const char* name;
+    serde::string_view name;
 
     /// @brief Unique index of the last field (one-based index)
     ///
@@ -123,13 +123,13 @@ struct StructDefinition<Struct> {
     /// This function obtains the name.
     ///
     /// @return Name/identifier of the struct
-    const char* struct_name() const {
+    constexpr serde::string_view struct_name() const {
         return name;
     }
 
     /// @brief Base StructDefinition Constructor
     /// @param name Name/identifier of the struct
-    explicit StructDefinition(const char* name)
+    constexpr explicit StructDefinition(serde::string_view name)
         : name(name) {}
 
     /// @brief Construct a new StructDefinition containing the provided field
@@ -138,7 +138,7 @@ struct StructDefinition<Struct> {
     /// @param ptr Pointer to the member variable. @see MemberPtr<>
     /// @return A new StructDefinition with containing the provided field
     template <class NewField>
-    constexpr auto with_field(const char* field_name, MemberPtr<Struct, NewField> ptr) const {
+    constexpr auto with_field(serde::string_view field_name, MemberPtr<Struct, NewField> ptr) const {
         auto new_field = FieldDefinition<Struct, NewField>(field_name, ptr);
         return StructDefinition<Struct, NewField>(new_field, *this);
     }
@@ -153,7 +153,7 @@ struct StructDefinition<Struct> {
     /// @param ptr Pointer to the member variable. @see MemberPtr<>
     /// @return A new StructDefinition with containing the provided field
     template <class NewField>
-    constexpr auto operator()(const char* field_name, MemberPtr<Struct, NewField> ptr) const {
+    constexpr auto operator()(serde::string_view field_name, MemberPtr<Struct, NewField> ptr) const {
         return with_field(field_name, ptr);
     }
 
@@ -202,14 +202,14 @@ struct StructDefinition<Struct> {
 
     /// @brief Helper function that recursively inputs field names into names_arr
     /// @param names_arr Existing array with at least `field_number` elements
-    void field_names(const char** names_arr) const {
+    void field_names(serde::string_view* names_arr) const {
         // No-op. Stop recursing.
     }
 
     /// @brief Obtain the `field_number` of the field named `field_name`, or 0
     /// @param field_name Name/identifier of the field
     /// @return A `field_number` (one-based index), or 0 if the field was not found
-    std::size_t index_of_field_name(const char* field_name) const {
+    std::size_t index_of_field_name(serde::string_view field_name) const {
         // No-op. Stop recursing.
         // Default value of 0 means that the field name was not found.
         return 0;
@@ -299,7 +299,7 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     /// This function obtains the name.
     ///
     /// @return Name/identifier of the struct
-    const char* struct_name() const {
+    constexpr serde::string_view struct_name() const {
         return previous_fields.struct_name();
     }
 
@@ -374,7 +374,7 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     void deserialize(de::Deserializer & deserializer, Struct & output) const {
         // Collect the list of field names. Avoid dynamic memory allocation.
         // TODO: Initializer list? Span?
-        const char* names[sizeof...(PreviousFields) + 1] = {};
+        serde::string_view names[sizeof...(PreviousFields) + 1] = {};
         field_names(names);
         de::Deserializer::FieldNames field_names(std::begin(names), std::end(names));
 
@@ -435,7 +435,7 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     ///   3. names_arr[2] = "Field3";
     ///
     /// @param names_arr Existing array with at least `field_number` elements
-    void field_names(const char** names_arr) const {
+    constexpr void field_names(serde::string_view* names_arr) const {
         previous_fields.field_names(names_arr);
         names_arr[field_number-1] = field.name;
     }
@@ -457,9 +457,9 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     ///
     /// @param field_name Name/identifier of the field
     /// @return A `field_number` (one-based index), or 0 if the field was not found
-    std::size_t index_of_field_name(const char* field_name) const {
+    constexpr std::size_t index_of_field_name(serde::string_view field_name) const {
         std::size_t result = previous_fields.index_of_field_name(field_name);
-        if (result == 0 && std::strcmp(field_name, field.name) == 0) {
+        if (result == 0 && field_name == field.name) {
             result = field_number;
         }
         return result;
@@ -482,7 +482,7 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
         /// @brief Human-readable hint at what the visitor is expecting
         /// @return A string literal
         const char* expecting() const override {
-            return defn.struct_name();
+            return defn.struct_name().data();
         }
 
         /// @brief Interpret and deserialize a map into the output struct instance
@@ -553,9 +553,8 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
 
         /// @brief Set `output` to the `field_number` of the field named `key`, or 0
         /// @param key Name/identifier of the field
-        /// @param key_end Length of key
-        void visit_string(const char* key, const char* key_end) override {
-            output = defn.index_of_field_name(key);
+        void visit_string(serde::string_view value) override {
+            output = defn.index_of_field_name(value);
         }
     };
 };

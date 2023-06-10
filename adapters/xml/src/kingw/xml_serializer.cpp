@@ -5,8 +5,8 @@
 
 namespace kingw {
 
-XmlSerializer::XmlSerializationException::XmlSerializationException(const char* message)
-    : std::runtime_error(message) { }
+XmlSerializer::XmlSerializationException::XmlSerializationException(serde::string_view message)
+    : ser::SerializationException(message) { }
 
 XmlSerializer::XmlSerializer(std::ostream & stream)
     : stream(stream) { }
@@ -51,8 +51,8 @@ void XmlSerializer::serialize_f64(double value) {
 void XmlSerializer::serialize_char(char value) {
     stream << value;
 }
-void XmlSerializer::serialize_string(const char* begin, const char* end) {
-    stream.write(begin, end - begin);
+void XmlSerializer::serialize_string(serde::string_view value) {
+    stream.write(value.data(), value.size());
 }
 
 
@@ -102,18 +102,18 @@ void XmlSerializer::map_end() {
 /// Structs 
 ///
 
-void XmlSerializer::struct_begin(const char* name, std::size_t len) {
+void XmlSerializer::struct_begin(serde::string_view name, std::size_t len) {
 }
-void XmlSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
+void XmlSerializer::struct_serialize_field(serde::string_view name, const ser::Serialize & field) {
     stream << "<";
-    serialize_string(name, name + std::strlen(name));
+    serialize_string(name);
     stream << ">";
     field.serialize(*this);
     stream << "</";
-    serialize_string(name, name + std::strlen(name));
+    serialize_string(name);
     stream << ">";
 }
-void XmlSerializer::struct_skip_field(const char * name) {
+void XmlSerializer::struct_skip_field(serde::string_view name) {
     // No-op
 }
 void XmlSerializer::struct_end() {

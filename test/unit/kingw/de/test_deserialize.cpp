@@ -34,8 +34,7 @@ TEST(KingwSerde, VisitorNotImplemented) {
     EXPECT_THROW(visitor.visit_f32(0.0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_f64(0.0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_char('\0'), Visitor::NotImplementedException);
-    char buffer[8] = {};
-    EXPECT_THROW(visitor.visit_string(std::begin(buffer), std::end(buffer)), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_string(""), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_seq(mock_seq_access), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_map(mock_map_access), Visitor::NotImplementedException);
 }

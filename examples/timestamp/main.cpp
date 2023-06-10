@@ -22,14 +22,14 @@ int main() {
     bool human_readable = true;
     kingw::SPrintfSerializer::to_buffer(timestamp, std::begin(buffer), std::end(buffer), human_readable);
     std::cout << "Timestamp serialized in human-readable format (yyyy-mm-ddThh:mm:ss.fffZ): " << buffer << "\n";
-    kingw::SPrintfDeserializer::from_buffer(deserialized, std::begin(buffer), std::end(buffer), human_readable);
+    kingw::SPrintfDeserializer::from_string(deserialized, buffer, human_readable);
     std::cout << "Deserialized time in milliseconds: " << millis(deserialized.value) << "\n\n";
 
     // Serialize/Deserialize the timestamp as the number of milliseconds since 1970-01-01 UTC.
     human_readable = false;
     kingw::SPrintfSerializer::to_buffer(timestamp, std::begin(buffer), std::end(buffer), human_readable);
     std::cout << "Timestamp serialized in non-human-readable format (milliseconds since 1970-01-01 UTC): " << buffer << "\n";
-    kingw::SPrintfDeserializer::from_buffer(deserialized, std::begin(buffer), std::end(buffer), human_readable);
+    kingw::SPrintfDeserializer::from_string(deserialized, buffer, human_readable);
     std::cout << "Deserialized time in milliseconds: " << millis(deserialized.value) << "\n\n";
 
     return 0;

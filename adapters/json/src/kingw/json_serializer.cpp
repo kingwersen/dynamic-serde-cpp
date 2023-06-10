@@ -5,7 +5,7 @@
 
 namespace kingw {
 
-JsonSerializer::JsonSerializationException::JsonSerializationException(const char* message)
+JsonSerializer::JsonSerializationException::JsonSerializationException(serde::string_view message)
     : ser::SerializationException(message) { }
 
 JsonSerializer::JsonSerializer() {
@@ -62,8 +62,8 @@ void JsonSerializer::serialize_f64(double value) {
 void JsonSerializer::serialize_char(char value) {
     json_stack.top() = value;
 }
-void JsonSerializer::serialize_string(const char * begin, const char * end) {
-    json_stack.top() = std::string(begin, end);
+void JsonSerializer::serialize_string(serde::string_view value) {
+    json_stack.top() = std::string(value.begin(), value.end());
 }
 
 
@@ -144,13 +144,13 @@ void JsonSerializer::map_end() {
 /// Structs 
 ///
 
-void JsonSerializer::struct_begin(const char* name, std::size_t len) {
+void JsonSerializer::struct_begin(serde::string_view name, std::size_t len) {
     // No-op. Assume previous serialize calls already 
     // gave us a nlohmann::json object to work with
     // at the top of the stack.
 }
 
-void JsonSerializer::struct_serialize_field(const char * name, const ser::Serialize & accessor) {
+void JsonSerializer::struct_serialize_field(serde::string_view name, const ser::Serialize & accessor) {
     // Add a new nlohmann::json object to the top of the stack.
     // accessor.serialize() will update it recursively.
     json_stack.push({});
@@ -162,10 +162,10 @@ void JsonSerializer::struct_serialize_field(const char * name, const ser::Serial
     }
     nlohmann::json field = std::move(json_stack.top());
     json_stack.pop();
-    json_stack.top()[name] = std::move(field);
+    json_stack.top()[std::string(name.begin(), name.end())] = std::move(field);
 }
 
-void JsonSerializer::struct_skip_field(const char * name) {
+void JsonSerializer::struct_skip_field(serde::string_view name) {
     // No-op
 }
 

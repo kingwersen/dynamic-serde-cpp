@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "kingw/ser/serialize.hpp"
+#include "kingw/serde/string_view.hpp"
 
 
 namespace kingw {
@@ -11,7 +12,7 @@ namespace ser {
 
 class SerializationException : public std::runtime_error {
 public:
-    explicit SerializationException(const char* message);
+    explicit SerializationException(serde::string_view message);
 };
 
 class Serializer
@@ -35,7 +36,7 @@ public:
     virtual void serialize_f32(float value) = 0;
     virtual void serialize_f64(double value) = 0;
     virtual void serialize_char(char value) = 0;
-    virtual void serialize_string(const char * begin, const char* end) = 0;
+    virtual void serialize_string(serde::string_view value) = 0;
 
     class SerializeSeq
     {
@@ -68,16 +69,16 @@ public:
     class SerializeStruct
     {
     public:
-        SerializeStruct(Serializer & serializer, const char* name, std::size_t len);
+        SerializeStruct(Serializer & serializer, serde::string_view name, std::size_t len);
         ~SerializeStruct();
-        void serialize_field(const char* name, const Serialize & accessor);
-        void skip_field(const char* name);
+        void serialize_field(serde::string_view name, const Serialize & accessor);
+        void skip_field(serde::string_view name);
         void end();
     private:
         Serializer & serializer;
         bool closed = false;
     };
-    virtual SerializeStruct serialize_struct(const char* name, std::size_t len = UNKNOWN_LENGTH);
+    virtual SerializeStruct serialize_struct(serde::string_view name, std::size_t len = UNKNOWN_LENGTH);
 
 protected:
     virtual void seq_begin(std::size_t len) = 0;
@@ -90,9 +91,9 @@ protected:
     virtual void map_serialize_entry(const Serialize & key, const Serialize & value) = 0;
     virtual void map_end() = 0;
 
-    virtual void struct_begin(const char* name, std::size_t len) = 0;
-    virtual void struct_serialize_field(const char * name, const Serialize & accessor) = 0;
-    virtual void struct_skip_field(const char * name) = 0;
+    virtual void struct_begin(serde::string_view name, std::size_t len) = 0;
+    virtual void struct_serialize_field(serde::string_view name, const Serialize & accessor) = 0;
+    virtual void struct_skip_field(serde::string_view name) = 0;
     virtual void struct_end() = 0;
 };
 

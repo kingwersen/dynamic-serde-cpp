@@ -1,5 +1,4 @@
 #include "timestamp.hpp"
-#include <iostream>
 
 #include "kingw/serde/derive.hpp"
 using namespace kingw;
@@ -28,7 +27,7 @@ void ser::serialize<Timestamp>(ser::Serializer & serializer, const Timestamp & t
 
         // Append milliseconds manually since std::strftime doesn't support it.
         len += std::snprintf(buffer + len, buffer_len - len, ".%ldZ", milliseconds % 1000);
-        serializer.serialize_string(buffer, buffer + len);
+        serializer.serialize_string(serde::string_view(buffer, len));
     } else {
         // Serialize the timestamp as the number of milliseconds since 1970-01-01 UTC.
         serializer.serialize_i64(milliseconds);
@@ -71,10 +70,10 @@ namespace {
         ///
         /// @param buffer Pointer to character array
         /// @param buffer_end End of character array
-        void visit_string(const char* buffer, const char* buffer_end) override {
+        void visit_string(serde::string_view value) override {
             // Verify the end of the string has a Z.
             // Now we can use 'Z' as the sentinel instead of len or '\0'.
-            if (buffer == buffer_end || buffer_end[-1] != 'Z') {
+            if (value.size() == 0 || *(value.end()-1) != 'Z') {
                 throw de::DeserializationException("failed to parse timestamp from string");
             }
 
@@ -82,20 +81,22 @@ namespace {
             // Use strptime() to parse "yyyy-mm-ddThh:mm:ss".
             // strptime() is guaranteed to not reach len because it doesn't parse 'Z'.
             std::tm tp{};
-            const char* end = strptime(buffer, "%FT%T", &tp);
+            const char* end = strptime(value.begin(), "%FT%T", &tp);
             if (*end == 'Z') {
                 // Timestamp does not have seconds in decimal format.
                 timestamp.value = std::chrono::system_clock::from_time_t(timegm(&tp));
             } else if (*end == '.') {
                 // Timestamp has seconds in decimal format.
-                buffer = end + 1;  // Move buffer to the beginning of the decimal value.
+                // Move buffer to the beginning of the decimal value
+                ++end;
+                value = serde::string_view(end, value.end() - end);
 
                 // Parse seconds decimal manually since strptime() can only handle seconds.
                 const std::size_t nanos_len = 9;  // Up to nanoseconds accuracy
                 char decimal[nanos_len + 1] = {};
                 std::size_t i = 0;
-                while (i < nanos_len && buffer[i] >= '0' && buffer[i] <= '9') { decimal[i] = buffer[i]; ++i; }
-                if (buffer[i] != 'Z') {
+                while (i < nanos_len && value[i] >= '0' && value[i] <= '9') { decimal[i] = value[i]; ++i; }
+                if (value[i] != 'Z') {
                     throw de::DeserializationException("failed to parse timestamp from string");
                 }
                 while (i < nanos_len) { decimal[i++] = '0'; }

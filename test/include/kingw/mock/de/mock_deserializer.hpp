@@ -27,7 +27,7 @@ public:
     MOCK_METHOD(void, deserialize_string, (Visitor &), (override));
     MOCK_METHOD(void, deserialize_seq, (Visitor &), (override));
     MOCK_METHOD(void, deserialize_map, (Visitor &), (override));
-    MOCK_METHOD(void, deserialize_struct, (const char*, const FieldNames &, Visitor &), (override));
+    MOCK_METHOD(void, deserialize_struct, (serde::string_view, const FieldNames &, Visitor &), (override));
 };
 
 class MockSeqAccess : public Deserializer::SeqAccess {
@@ -58,7 +58,7 @@ public:
     MOCK_METHOD(void, visit_f32, (float), (override));
     MOCK_METHOD(void, visit_f64, (double), (override));
     MOCK_METHOD(void, visit_char, (char), (override));
-    MOCK_METHOD(void, visit_string, (const char*, const char*), (override));
+    MOCK_METHOD(void, visit_string, (serde::string_view), (override));
     MOCK_METHOD(void, visit_seq, (Deserializer::SeqAccess &), (override));
     MOCK_METHOD(void, visit_map, (Deserializer::MapAccess &), (override));
 };

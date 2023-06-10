@@ -37,8 +37,7 @@ TEST(KingwSerde, BoolVisitorInvalid) {
     EXPECT_THROW(visitor.visit_f32(0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_f64(0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_char('\0'), Visitor::NotImplementedException);
-    char buffer[8] = {};
-    EXPECT_THROW(visitor.visit_string(std::begin(buffer), std::end(buffer)), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_string(""), Visitor::NotImplementedException);
 }
 
 /*
@@ -81,8 +80,7 @@ TEST(KingwSerde, I8VisitorInvalid) {
     EXPECT_THROW(visitor.visit_f32(0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_f64(0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_char('\0'), Visitor::NotImplementedException);
-    char buffer[8] = {};
-    EXPECT_THROW(visitor.visit_string(std::begin(buffer), std::end(buffer)), Visitor::NotImplementedException);
+    EXPECT_THROW(visitor.visit_string(""), Visitor::NotImplementedException);
 }
 
 TEST(KingwSerde, I8VisitorExpecting) {
@@ -112,12 +110,9 @@ TEST(KingwSerde, CharVisitorInvalid) {
     EXPECT_THROW(visitor.visit_u64(0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_f32(0), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_f64(0), Visitor::NotImplementedException);
-    std::string str = "";
-    EXPECT_THROW(visitor.visit_string(std::begin(str).base(), std::end(str).base()), DeserializationException);
-    str = "ab";
-    EXPECT_THROW(visitor.visit_string(std::begin(str).base(), std::end(str).base()), DeserializationException);
-    str = "hello";
-    EXPECT_THROW(visitor.visit_string(std::begin(str).base(), std::end(str).base()), DeserializationException);
+    EXPECT_THROW(visitor.visit_string(""), DeserializationException);
+    EXPECT_THROW(visitor.visit_string("ab"), DeserializationException);
+    EXPECT_THROW(visitor.visit_string("hello"), DeserializationException);
 }
 
 TEST(KingwSerde, StringVisitorExpecting) {

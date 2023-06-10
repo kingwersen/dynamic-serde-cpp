@@ -4,8 +4,8 @@
 namespace kingw {
 namespace ser {
 
-SerializationException::SerializationException(const char* message)
-    : std::runtime_error(message) { }
+SerializationException::SerializationException(serde::string_view message)
+    : std::runtime_error(message.data()) { }
 
 Serializer::SerializeSeq Serializer::serialize_seq(std::size_t len) {
     return SerializeSeq{ *this,  len };
@@ -59,21 +59,21 @@ void Serializer::SerializeMap::end() {
     }
 }
 
-Serializer::SerializeStruct Serializer::serialize_struct(const char* name, std::size_t len) {
+Serializer::SerializeStruct Serializer::serialize_struct(serde::string_view name, std::size_t len) {
     return SerializeStruct{ *this, name, len };
 }
-Serializer::SerializeStruct::SerializeStruct(Serializer & serializer, const char* name, std::size_t len): serializer(serializer) {
+Serializer::SerializeStruct::SerializeStruct(Serializer & serializer, serde::string_view name, std::size_t len): serializer(serializer) {
     serializer.struct_begin(name, len);
 }
 Serializer::SerializeStruct::~SerializeStruct() {
     end();
 }
-void Serializer::SerializeStruct::serialize_field(const char * name, const Serialize & accessor) {
+void Serializer::SerializeStruct::serialize_field(serde::string_view name, const Serialize & accessor) {
     if (!closed) {
         serializer.struct_serialize_field(name, accessor);
     }
 }
-void Serializer::SerializeStruct::skip_field(const char * name) {
+void Serializer::SerializeStruct::skip_field(serde::string_view name) {
     if (!closed) {
         serializer.struct_skip_field(name);
     }
@@ -139,7 +139,11 @@ void serialize<char>(Serializer & serializer, const char & data) {
 }
 template <>
 void serialize<std::string>(Serializer & serializer, const std::string & data) {
-    serializer.serialize_string(data.data(), data.data() + data.size());
+    serializer.serialize_string(data);
+}
+template <>
+void serialize<serde::string_view>(Serializer & serializer, const serde::string_view & data) {
+    serializer.serialize_string(data);
 }
 
 }

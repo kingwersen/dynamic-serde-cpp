@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "kingw/de/deserialize.hpp"
+#include "kingw/serde/string_view.hpp"
 
 
 namespace kingw {
@@ -15,7 +16,7 @@ class DeserializationException : public std::runtime_error {
 public:
     /// @brief DeserializationException Constructor
     /// @param message Cause of the exception
-    explicit DeserializationException(const char* message);
+    explicit DeserializationException(serde::string_view message);
 };
 
 // Forward-declare from later in this file
@@ -59,12 +60,12 @@ public:
     class FieldNames
     {
     public:
-        /// @brief Alias for an iterator to a collection of (const char*)
-        using Iterator = const char* const*;
+        /// @brief Alias for an iterator to a collection of (serde::string_view)
+        using Iterator = const serde::string_view*;
 
         /// @brief Initializer List Constructor (implicit)
         /// @param init List of (const char*)
-        FieldNames(std::initializer_list<const char*> init);
+        FieldNames(std::initializer_list<serde::string_view> init);
 
         /// @brief Iterator Pair Constructor
         /// @param begin Forward iter (begin) to a collection of (const char*)
@@ -87,7 +88,7 @@ public:
         /// and end() instead and will not interact with the list itself.
         ///
         /// If using the Iterator pair constructor, this field will be unused.
-        std::initializer_list<const char*> list;  // maybe unused
+        std::initializer_list<serde::string_view> list;  // maybe unused
 
         /// @brief Iterator to the first field name
         Iterator begin_;
@@ -149,7 +150,7 @@ public:
     virtual void deserialize_string(Visitor & visitor) = 0;
     virtual void deserialize_seq(Visitor & visitor) = 0;
     virtual void deserialize_map(Visitor & visitor) = 0;
-    virtual void deserialize_struct(const char* struct_name,
+    virtual void deserialize_struct(serde::string_view struct_name,
         const FieldNames & field_names, 
         Visitor & visitor) = 0;
 
@@ -272,7 +273,7 @@ public:
     public:
         /// @brief NotImplementedException Constructor
         /// @param message Cause of the exception
-        explicit NotImplementedException(const char* message);
+        explicit NotImplementedException(serde::string_view message);
     };
 
     /// @brief Visitor Destructor
@@ -328,7 +329,7 @@ public:
     virtual void visit_f32(float value);
     virtual void visit_f64(double value);
     virtual void visit_char(char value);
-    virtual void visit_string(const char* begin, const char* end);
+    virtual void visit_string(serde::string_view value);
     virtual void visit_seq(Deserializer::SeqAccess & value);
     virtual void visit_map(Deserializer::MapAccess & value);
 };

@@ -42,7 +42,7 @@ int main() {
     std::cout << "\n";
 
     MyStruct data4;
-    kingw::SPrintfDeserializer::from_buffer(data4, std::begin(buffer), std::end(buffer));
+    kingw::SPrintfDeserializer::from_string(data4, kingw::serde::string_view(buffer, sizeof(buffer)));
     std::cout << "SPrintfDeserializer output: " << data4.value2 << "\n";
 
     return 0;

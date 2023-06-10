@@ -15,20 +15,13 @@ public:
     };
 
     template <class T>
-    static const char* from_buffer(T & item, const char* buffer_begin, const char* buffer_end, bool human_readable = true) {
-        SPrintfDeserializer deserializer(buffer_begin, buffer_end, human_readable);
+    static const char* from_string(T & item, serde::string_view input, bool human_readable = true) {
+        SPrintfDeserializer deserializer(input, human_readable);
         de::deserialize(deserializer, item);
         return deserializer.last_end();
     }
 
-    template <class T, std::size_t N>
-    static const char* from_buffer(T & item, const char (&buffer)[N], bool human_readable = true) {
-        SPrintfDeserializer deserializer(buffer, buffer + N, human_readable);
-        de::deserialize(deserializer, item);
-        return deserializer.last_end();
-    }
-
-    SPrintfDeserializer(const char* buffer_begin, const char* buffer_end, bool human_readable = true);
+    SPrintfDeserializer(serde::string_view input, bool human_readable = true);
     bool is_human_readable() const override;
     const char* last_end() const;
 
@@ -50,7 +43,7 @@ public:
     void deserialize_seq(de::Visitor & visitor) override;
     void deserialize_map(de::Visitor & visitor) override;
     void deserialize_struct(
-        const char* name,
+        serde::string_view name,
         const FieldNames & field_names,
         de::Visitor & visitor) override;
 
@@ -81,14 +74,10 @@ public:
     };
 
 protected:
-    struct StringView {
-        const char* begin;
-        const char* end;
-    };
-    StringView next_delimited_string();
+    serde::string_view next_delimited_string();
 
 private:
-    StringView buffer;
+    serde::string_view buffer;
     const char* last_end_;
     bool human_readable;
 };

@@ -5,7 +5,7 @@
 
 namespace kingw {
 
-JsonDeserializer::JsonDeserializationException::JsonDeserializationException(const char* message)
+JsonDeserializer::JsonDeserializationException::JsonDeserializationException(serde::string_view message)
     : de::DeserializationException(message) { }
 
 JsonDeserializer::JsonDeserializer(const nlohmann::json & contents) {
@@ -118,8 +118,7 @@ void JsonDeserializer::deserialize_char(de::Visitor & visitor) {
 void JsonDeserializer::deserialize_string(de::Visitor & visitor) {
     auto & json = json_stack.top();
     if (json.is_string()) {
-        std::string value = json;
-        visitor.visit_string(value.begin().base(), value.end().base());
+        visitor.visit_string(json);
     } else {
         throw JsonDeserializationException("json value was not a string");
     }
@@ -143,7 +142,7 @@ void JsonDeserializer::deserialize_map(de::Visitor & visitor) {
     }
 }
 void JsonDeserializer::deserialize_struct(
-    const char* name,
+    serde::string_view name,
     const FieldNames & field_names,
     de::Visitor & visitor)
 {
@@ -209,7 +208,7 @@ bool JsonDeserializer::JsonStructAccess::has_next() {
 void JsonDeserializer::JsonStructAccess::next_key(de::Deserialize & key) {
     if (has_next()) {
         // TODO: Make efficient with pointers. Be careful with std::stack iterator invalidation.
-        JsonDeserializer deserializer(std::string("\"") + *iter + "\"");
+        JsonDeserializer deserializer(std::string("\"") + std::string(iter->begin(), iter->end()) + "\"");
         key.deserialize(deserializer);
     } else {
         throw JsonDeserializationException("json end of map reached");
@@ -218,7 +217,7 @@ void JsonDeserializer::JsonStructAccess::next_key(de::Deserialize & key) {
 void JsonDeserializer::JsonStructAccess::next_value(de::Deserialize & value) {
     if (has_next()) {
         // TODO: Make efficient with pointers. Be careful with std::stack iterator invalidation.
-        JsonDeserializer deserializer(map[*iter]);
+        JsonDeserializer deserializer(map[std::string(iter->begin(), iter->end())]);
         value.deserialize(deserializer);
         ++iter;
     } else {

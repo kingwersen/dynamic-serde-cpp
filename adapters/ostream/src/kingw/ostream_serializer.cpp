@@ -48,8 +48,8 @@ void OStreamSerializer::serialize_f64(double value) {
 void OStreamSerializer::serialize_char(char value) {
     stream << value;
 }
-void OStreamSerializer::serialize_string(const char* begin, const char* end) {
-    stream.write(begin, end - begin);
+void OStreamSerializer::serialize_string(serde::string_view value) {
+    stream.write(value.data(), value.size());
 }
 
 
@@ -100,17 +100,16 @@ void OStreamSerializer::map_end() {
 /// Structs 
 ///
 
-void OStreamSerializer::struct_begin(const char* name, std::size_t len) {
+void OStreamSerializer::struct_begin(serde::string_view name, std::size_t len) {
     // No-op
 }
 
-void OStreamSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
-    std::size_t len = std::strlen(name);
-    serialize_string(name, name + len);
+void OStreamSerializer::struct_serialize_field(serde::string_view name, const ser::Serialize & field) {
+    serialize_string(name);
     field.serialize(*this);
 }
 
-void OStreamSerializer::struct_skip_field(const char * name) {
+void OStreamSerializer::struct_skip_field(serde::string_view name) {
     // No-op
 }
 

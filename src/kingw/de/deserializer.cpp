@@ -9,10 +9,10 @@
 namespace kingw {
 namespace de {
 
-DeserializationException::DeserializationException(const char* message)
-    : std::runtime_error(message) { }
+DeserializationException::DeserializationException(serde::string_view message)
+    : std::runtime_error(message.data()) { }
 
-Deserializer::FieldNames::FieldNames(std::initializer_list<const char*> init)
+Deserializer::FieldNames::FieldNames(std::initializer_list<serde::string_view> init)
     : list(init), begin_(list.begin()), end_(list.end()) {}
 
 Deserializer::FieldNames::FieldNames(Iterator begin, Iterator end)
@@ -26,8 +26,8 @@ Deserializer::FieldNames::Iterator Deserializer::FieldNames::end() const {
     return end_;
 }
 
-Visitor::NotImplementedException::NotImplementedException(const char* message)
-    : DeserializationException(message) { }
+Visitor::NotImplementedException::NotImplementedException(serde::string_view message)
+    : DeserializationException(message.data()) { }
 
 // Default implementations for unused visitor functions.
 // If they are called when not implemented, throw a runtime exception.
@@ -43,7 +43,7 @@ void Visitor::visit_u64(std::uint64_t value) { throw NotImplementedException("vi
 void Visitor::visit_f32(float value) { throw NotImplementedException("visitor unexpected type f32"); }
 void Visitor::visit_f64(double value) { throw NotImplementedException("visitor unexpected type f64"); }
 void Visitor::visit_char(char value) { throw NotImplementedException("visitor unexpected type char"); }
-void Visitor::visit_string(const char* begin, const char* end) { throw NotImplementedException("visitor unexpected type string"); }
+void Visitor::visit_string(serde::string_view value) { throw NotImplementedException("visitor unexpected type string"); }
 void Visitor::visit_seq(Deserializer::SeqAccess & value) { throw NotImplementedException("visitor unexpected type seq"); }
 void Visitor::visit_map(Deserializer::MapAccess & value) { throw NotImplementedException("visitor unexpected type map"); }
 
@@ -232,9 +232,9 @@ const char* CharVisitor::expecting() const {
 void CharVisitor::visit_char(char value) {
     output = value;
 }
-void CharVisitor::visit_string(const char* begin, const char* end) {
-    if (end - begin == 1) {
-        output = begin[0];
+void CharVisitor::visit_string(serde::string_view value) {
+    if (value.size() == 1) {
+        output = value[0];
     } else {
         throw DeserializationException("string does not contain exactly one character");
     }
@@ -245,9 +245,9 @@ StringVisitor::StringVisitor(char* output_begin, char* output_end)
 const char* StringVisitor::expecting() const {
     return "a string";
 }
-void StringVisitor::visit_string(const char* begin, const char* end) {
-    if ((end - begin) <= (output_end - output_begin)) {
-        char* copy_end = std::copy(begin, end, output_begin);
+void StringVisitor::visit_string(serde::string_view value) {
+    if (value.size() <= (output_end - output_begin)) {
+        char* copy_end = std::copy(value.begin(), value.end(), output_begin);
         std::fill(copy_end, output_end, '\0');
     } else {
         throw DeserializationException("deserialized string doesn't fit in fixed-size buffer");
@@ -259,8 +259,8 @@ StdStringVisitor::StdStringVisitor(std::string & output)
 const char* StdStringVisitor::expecting() const {
     return "a string";
 }
-void StdStringVisitor::visit_string(const char* begin, const char* end) {
-    output = std::string(begin, end);
+void StdStringVisitor::visit_string(serde::string_view value) {
+    output = std::string(value.data(), value.size());
 }
 
 

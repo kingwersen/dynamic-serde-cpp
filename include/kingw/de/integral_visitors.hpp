@@ -270,7 +270,7 @@ public:
     explicit CharVisitor(char & output);
     const char* expecting() const override;
     void visit_char(char value) override;
-    void visit_string(const char* begin, const char* end) override;
+    void visit_string(serde::string_view value) override;
 };
 
 /// @brief Default String Visitor
@@ -285,7 +285,7 @@ public:
     char* output_end;
     explicit StringVisitor(char* output_begin, char* output_end);
     const char* expecting() const override;
-    void visit_string(const char* begin, const char* end) override;
+    void visit_string(serde::string_view value) override;
 };
 
 /// @brief Default String Visitor
@@ -299,7 +299,7 @@ public:
     std::string & output;
     explicit StdStringVisitor(std::string & output);
     const char* expecting() const override;
-    void visit_string(const char* begin, const char* end) override;
+    void visit_string(serde::string_view value) override;
 };
 
 }  // namespace de

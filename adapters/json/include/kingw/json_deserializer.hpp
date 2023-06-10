@@ -16,7 +16,7 @@ class JsonDeserializer :
 public:
     class JsonDeserializationException : public de::DeserializationException {
     public:
-        explicit JsonDeserializationException(const char* message);
+        explicit JsonDeserializationException(serde::string_view message);
     };
 
     template <class T>
@@ -55,7 +55,7 @@ public:
     void deserialize_seq(de::Visitor & visitor) override;
     void deserialize_map(de::Visitor & visitor) override;
     void deserialize_struct(
-        const char* name,
+        serde::string_view name,
         const FieldNames & field_names,
         de::Visitor & visitor) override;
 

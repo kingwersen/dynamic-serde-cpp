@@ -5,6 +5,7 @@
 #include "kingw/mock/ser/mock_serialize.hpp"
 #include "kingw/mock/ser/mock_serializer.hpp"
 
+using namespace kingw;
 using namespace kingw::ser;
 using namespace testing;  // GMock, for testing::Ref, testing::_, etc.
 
@@ -86,10 +87,10 @@ TEST(KingwSerde, SerializeMapEnd) {
 /// SerializeStruct shall call serializer.struct_begin() on construction, serializer.struct_end() on destruction,
 /// and serializer.struct_serialize_field() or serializer.struct_skip_field() once for each call.
 TEST(KingwSerde, SerializeStruct) {
-    const char* name1 = "name1";
-    const char* name2 = "name2";
-    const char* name3 = "name3";
-    const char* name4 = "name4";
+    serde::string_view name1 = "name1";
+    serde::string_view name2 = "name2";
+    serde::string_view name3 = "name3";
+    serde::string_view name4 = "name4";
     MockSerialize mock_serialize1;
     MockSerialize mock_serialize2;
     MockSerializer mock_serializer;

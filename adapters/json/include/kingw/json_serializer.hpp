@@ -16,7 +16,7 @@ class JsonSerializer :
 public:
     class JsonSerializationException : public ser::SerializationException {
     public:
-        explicit JsonSerializationException(const char* message);
+        explicit JsonSerializationException(serde::string_view message);
     };
 
     template <class T>
@@ -43,7 +43,7 @@ public:
     void serialize_f32(float value) override;
     void serialize_f64(double value) override;
     void serialize_char(char value) override;
-    void serialize_string(const char * begin, const char* end) override;
+    void serialize_string(serde::string_view value) override;
 
 protected:
     // Lists/Sequences
@@ -62,9 +62,9 @@ protected:
 
     // Structs
     // Use serialize_struct() instead.
-    void struct_begin(const char* name, std::size_t len) override;
-    void struct_serialize_field(const char * name, const ser::Serialize & accessor) override;
-    void struct_skip_field(const char * name) override;
+    void struct_begin(serde::string_view name, std::size_t len) override;
+    void struct_serialize_field(serde::string_view name, const ser::Serialize & accessor) override;
+    void struct_skip_field(serde::string_view name) override;
     void struct_end() override;
 
 private:

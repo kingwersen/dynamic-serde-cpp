@@ -6,7 +6,7 @@
 
 namespace kingw {
 
-SPrintfSerializer::SPrintfSerializationException::SPrintfSerializationException(const char* message)
+SPrintfSerializer::SPrintfSerializationException::SPrintfSerializationException(serde::string_view message)
     : ser::SerializationException(message) { }
 
 SPrintfSerializer::SPrintfSerializer(char* buffer_begin, char* buffer_end, bool human_readable)
@@ -76,11 +76,10 @@ void SPrintfSerializer::serialize_char(char value) {
         throw SPrintfSerializationException("failed to serialize character");
     }
 }
-void SPrintfSerializer::serialize_string(const char* begin, const char* end) {
-    std::size_t distance = end - begin;
-    if (distance <= buffer.size()) {
-        std::copy(begin, end, buffer.begin);
-        advance(distance);
+void SPrintfSerializer::serialize_string(serde::string_view value) {
+    if (value.size() <= buffer.size()) {
+        std::copy(value.begin(), value.end(), buffer.begin);
+        advance(value.size());
     } else {
         throw SPrintfSerializationException("failed to serialize string - too long");
     }
@@ -146,7 +145,7 @@ void SPrintfSerializer::map_end() {
 /// Structs 
 ///
 
-void SPrintfSerializer::struct_begin(const char* name, std::size_t len) {
+void SPrintfSerializer::struct_begin(serde::string_view name, std::size_t len) {
     // Serialize the number of fields in the struct.
     // If len is not provided, then throw an exception.
     if (len == UNKNOWN_LENGTH) {
@@ -156,12 +155,12 @@ void SPrintfSerializer::struct_begin(const char* name, std::size_t len) {
     }
 }
 
-void SPrintfSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
-    serialize_string(name, name + std::strlen(name));
+void SPrintfSerializer::struct_serialize_field(serde::string_view name, const ser::Serialize & field) {
+    serialize_string(name);
     field.serialize(*this);
 }
 
-void SPrintfSerializer::struct_skip_field(const char * name) {
+void SPrintfSerializer::struct_skip_field(serde::string_view name) {
     // No-op
 }
 
