@@ -86,6 +86,72 @@ Accessor<T> accessor(T & output) {
     return Accessor<T>(output);
 }
 
+template <class T>
+class ArrayVisitor : public Visitor {
+public:
+    /// @brief StdVectorVisitor Constructor
+    /// @param output_begin Pointer to beginning of array to deserialize into
+    /// @param output_end Pointer to end of array to deserialize into
+    explicit ArrayVisitor(T* output_begin, T* output_end) : output_begin(output_begin), output_end(output_end) { }
+
+    /// @brief Explanation of what this Visitor is expecting
+    /// @return A string literal
+    const char* expecting() const override { return "a sequence of items"; }
+
+    /// @brief Extract items from `seq` and put them into `output`
+    ///
+    /// `Deserializer` does not know what type of vector we are.
+    ///
+    /// First, by calling `Deserializer::deserialize_seq()` we tell the
+    /// `Deserializer` that the next item it will deserialize should
+    /// be some sort of list/sequence. `seq` is a generic, untyped
+    /// representation of the list that it found.
+    ///
+    /// It is our job in this function to figure out what it found
+    /// and convert it into a list of type T.
+    ///
+    /// We do this by providing an `Accessor<T>` (containing a reference
+    /// to the next element in `std::vector<T>`) back to the `Deserializer`
+    /// through `seq.next_element()`. The `Deserializer` can
+    /// then call `accessor.deserialize()` to fill the data.
+    ///
+    /// @param seq Data from `Deserializer`
+    void visit_seq(Deserializer::SeqAccess & seq) override {
+        T* iter = output_begin;
+        while (seq.has_next() && iter != output_end) {
+            de::Accessor<T> accessor(*iter);
+            seq.next_element(accessor);
+            ++iter;
+        }
+        if (seq.has_next() || iter != output_end) {
+            throw de::DeserializationException("found an incorrect number of elements for fixed size array");
+        }
+    }
+
+private:
+    /// @brief Reference of variable to deserialize into
+    T* output_begin;
+    T* output_end;
+};
+
+/// @brief `deserialize()` specialization for C-style arrays.
+/// @tparam T Array element type
+/// @tparam N Compile-time array length
+/// @param deserializer Deserializer to extract from
+/// @param output Output location
+template <class T, std::size_t N>
+void deserialize(Deserializer & deserializer, T (&output)[N]) {
+    if (std::is_same<T, char>::value) {
+        //StringVisitor visitor(output, output + N);
+        //deserializer.deserialize_string(visitor);
+        // TODO: Need to figure out some include order problems.
+        throw de::DeserializationException("NOT YET IMPLEMENTED");
+    } else {
+        ArrayVisitor<T> visitor(output, output + N);
+        deserializer.deserialize_seq(visitor);
+    }
+}
+
 /// @brief Generic Visitor class for `std::vector<T>` deserialization
 ///
 /// Used by `deserialize<std::vector<T>>()`.
