@@ -1,10 +1,9 @@
 #include <iostream>
 
-#include "kingw/sprintf_serializer.hpp"
-#include "kingw/sprintf_deserializer.hpp"
-#include "kingw/json_serializer.hpp"
-#include "kingw/json_deserializer.hpp"
-#include "kingw/xml_serializer.hpp"
+#include "kingw/serde_sprintf.hpp"
+#include "kingw/serde_json.hpp"
+#include "kingw/serde_xml.hpp"
+using namespace kingw;
 
 #include "structs1.hpp"
 
@@ -15,14 +14,14 @@ int main() {
     //
     // JsonSerializer (high level string manipulation)
     //
-    auto str = kingw::JsonSerializer::to_string(data);
+    auto str = serde_json::to_string(data);
     std::cout << str << "\n";
-    std::cout << kingw::XmlSerializer::to_string(data) << "\n";
+    std::cout << serde_xml::to_string(data) << "\n";
 
-    MyStruct data2 = kingw::JsonDeserializer::from_string<MyStruct>(str);
+    MyStruct data2 = serde_json::from_string<MyStruct>(str);
     std::cout << data2.value2 << "\n";
 
-    auto data3 = kingw::JsonDeserializer::from_string
+    auto data3 = serde_json::from_string
         <std::map<std::string, std::string>>("{\"Hello\":\"World!\"}");
     for (auto & kvp : data3) {
         std::cout << kvp.first << ":" << kvp.second << ", ";
@@ -33,7 +32,7 @@ int main() {
     // SPrintfSerializer (low level string manipulation)
     //
     char buffer[128] = {};
-    char* end = kingw::SPrintfSerializer::to_buffer(data, std::begin(buffer), std::end(buffer));
+    char* end = serde_sprintf::to_buffer(data, std::begin(buffer), std::end(buffer));
 
     std::cout << "SPrintfSerializer output: ";
     for (char* iter = buffer; iter < end; ++iter) {
@@ -42,7 +41,7 @@ int main() {
     std::cout << "\n";
 
     MyStruct data4;
-    kingw::SPrintfDeserializer::from_string(data4, kingw::serde::string_view(buffer, sizeof(buffer)));
+    serde_sprintf::from_string(data4, serde::string_view(buffer, sizeof(buffer)));
     std::cout << "SPrintfDeserializer output: " << data4.value2 << "\n";
 
     return 0;

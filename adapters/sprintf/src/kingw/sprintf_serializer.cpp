@@ -5,6 +5,7 @@
 
 
 namespace kingw {
+namespace serde_sprintf {
 
 SPrintfSerializer::SPrintfSerializationException::SPrintfSerializationException(serde::string_view message)
     : ser::SerializationException(message) { }
@@ -178,7 +179,7 @@ void SPrintfSerializer::advance(std::size_t distance) {
         // Always delimit sprintf() calls with '\0'.
         last_end_ = buffer.begin + distance;
         buffer.begin[distance] = '\0';
-        buffer.begin += (distance) + 1;
+        buffer.begin += distance + 1;
     } else {
         if (distance > size_) {
             // Sanity check against OOB.
@@ -189,4 +190,5 @@ void SPrintfSerializer::advance(std::size_t distance) {
     }
 }
 
+}  // namespace serde_sprintf
 }  // namespace kingw

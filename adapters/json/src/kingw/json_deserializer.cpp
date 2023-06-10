@@ -4,6 +4,7 @@
 
 
 namespace kingw {
+namespace serde_json {
 
 JsonDeserializer::JsonDeserializationException::JsonDeserializationException(serde::string_view message)
     : de::DeserializationException(message) { }
@@ -229,4 +230,5 @@ void JsonDeserializer::JsonStructAccess::next_entry(de::Deserialize & key, de::D
     next_value(value);
 }
 
+}  // namespace serde_json
 }  // namespace kingw

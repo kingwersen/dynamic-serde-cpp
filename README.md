@@ -65,8 +65,9 @@ DERIVE_SERDE(ExampleStruct,
 // main.cpp
 
 #include <iostream>
-#include <kingw/json_serializer.hpp>
+#include <kingw/serde_json.hpp>
 #include "structs.hpp"
+using namespace kingw;
 
 int main() {
     ExampleStruct data {
@@ -76,7 +77,7 @@ int main() {
     };
 
     // Prints: {"items":[1,2,3],"name":"Hello, World!","value":5}
-    std::cout << kingw::JsonSerializer::to_string(data) << "\n";
+    std::cout << serde_json::to_string(data) << "\n";
     
     return 0;
 }

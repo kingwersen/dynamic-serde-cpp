@@ -9,6 +9,7 @@
 
 
 namespace kingw {
+namespace serde_json {
 
 class JsonDeserializer :
     public de::Deserializer
@@ -18,20 +19,6 @@ public:
     public:
         explicit JsonDeserializationException(serde::string_view message);
     };
-
-    template <class T>
-    static void from_string(const T & item, const std::string & contents) {
-        JsonDeserializer deserializer(contents);
-        de::deserialize(deserializer, item);
-    }
-
-    template <class T>
-    static T from_string(const std::string & contents) {
-        T item;
-        JsonDeserializer deserializer(contents);
-        de::deserialize(deserializer, item);
-        return item;
-    }
 
     explicit JsonDeserializer(const nlohmann::json & contents);
     explicit JsonDeserializer(const std::string & contents);
@@ -102,4 +89,19 @@ private:
     std::stack<nlohmann::json> json_stack;
 };
 
+template <class T>
+void from_string(const T & output, const std::string & contents) {
+    JsonDeserializer deserializer(contents);
+    de::deserialize(deserializer, output);
+}
+
+template <class T>
+T from_string(const std::string & contents) {
+    T output;
+    JsonDeserializer deserializer(contents);
+    de::deserialize(deserializer, output);
+    return output;
+}
+
+}  // namespace serde_json
 }  // namespace kingw

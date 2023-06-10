@@ -4,6 +4,7 @@
 
 
 namespace kingw {
+namespace serde_sprintf {
 
 class SPrintfDeserializer :
     public de::Deserializer
@@ -11,15 +12,8 @@ class SPrintfDeserializer :
 public:
     class SPrintfDeserializationException : public de::DeserializationException {
     public:
-        explicit SPrintfDeserializationException(const char* message);
+        explicit SPrintfDeserializationException(serde::string_view message);
     };
-
-    template <class T>
-    static const char* from_string(T & item, serde::string_view input, bool human_readable = true) {
-        SPrintfDeserializer deserializer(input, human_readable);
-        de::deserialize(deserializer, item);
-        return deserializer.last_end();
-    }
 
     SPrintfDeserializer(serde::string_view input, bool human_readable = true);
     bool is_human_readable() const override;
@@ -82,4 +76,12 @@ private:
     bool human_readable;
 };
 
+template <class T>
+const char* from_string(T & output, serde::string_view input, bool human_readable = true) {
+    SPrintfDeserializer deserializer(input, human_readable);
+    de::deserialize(deserializer, output);
+    return deserializer.last_end();
+}
+
+}  // namespace serde_sprintf
 }  // namespace kingw

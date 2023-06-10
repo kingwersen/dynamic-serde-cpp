@@ -9,6 +9,7 @@
 
 
 namespace kingw {
+namespace serde_json {
 
 class JsonSerializer :
     public ser::Serializer
@@ -18,13 +19,6 @@ public:
     public:
         explicit JsonSerializationException(serde::string_view message);
     };
-
-    template <class T>
-    static std::string to_string(const T & item) {
-        JsonSerializer serializer;
-        ser::serialize(serializer, item);
-        return serializer.dump();
-    }
 
     JsonSerializer();
     bool is_human_readable() const override;
@@ -72,4 +66,12 @@ private:
     std::string current_map_key;
 };
 
+template <class T>
+std::string to_string(const T & input) {
+    JsonSerializer serializer;
+    ser::serialize(serializer, input);
+    return serializer.dump();
+}
+
+}  // namespace serde_json
 }  // namespace kingw

@@ -7,6 +7,7 @@
 
 
 namespace kingw {
+namespace serde_xml {
 
 class XmlSerializer :
     public ser::Serializer
@@ -16,19 +17,6 @@ public:
     public:
         explicit XmlSerializationException(serde::string_view message);
     };
-
-    template <class T>
-    static std::string to_string(const T & item) {
-        std::ostringstream stream;
-        XmlSerializer serializer(stream);
-        ser::serialize(serializer, item);
-        return stream.str();
-    }
-
-    template <class T>
-    void serialize(const T & item) {
-        ser::serialize(*this, item);
-    }
 
     explicit XmlSerializer(std::ostream & stream);
     bool is_human_readable() const override;
@@ -75,4 +63,13 @@ private:
     std::stack<std::string> open_tags;
 };
 
+template <class T>
+std::string to_string(const T & input) {
+    std::ostringstream stream;
+    XmlSerializer serializer(stream);
+    ser::serialize(serializer, input);
+    return stream.str();
+}
+
+}  // namespace serde_xml
 }  // namespace kingw

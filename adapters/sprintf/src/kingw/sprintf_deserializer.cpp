@@ -4,8 +4,9 @@
 
 
 namespace kingw {
+namespace serde_sprintf {
 
-SPrintfDeserializer::SPrintfDeserializationException::SPrintfDeserializationException(const char * message)
+SPrintfDeserializer::SPrintfDeserializationException::SPrintfDeserializationException(serde::string_view message)
     : de::DeserializationException(message) { }
 
 SPrintfDeserializer::SPrintfDeserializer(serde::string_view input, bool human_readable)
@@ -197,4 +198,5 @@ serde::string_view SPrintfDeserializer::next_delimited_string() {
     return result;
 }
 
+}  // namespace serde_sprintf
 }  // namespace kingw

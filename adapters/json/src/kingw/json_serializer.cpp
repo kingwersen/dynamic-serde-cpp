@@ -4,6 +4,7 @@
 
 
 namespace kingw {
+namespace serde_json {
 
 JsonSerializer::JsonSerializationException::JsonSerializationException(serde::string_view message)
     : ser::SerializationException(message) { }
@@ -173,4 +174,5 @@ void JsonSerializer::struct_end() {
     // No-op
 }
 
+}  // namespace serde_json
 }  // namespace kingw

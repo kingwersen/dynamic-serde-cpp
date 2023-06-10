@@ -4,6 +4,7 @@
 
 
 namespace kingw {
+namespace serde_xml {
 
 XmlSerializer::XmlSerializationException::XmlSerializationException(serde::string_view message)
     : ser::SerializationException(message) { }
@@ -81,7 +82,7 @@ void XmlSerializer::map_serialize_key(const ser::Serialize & key) {
     if (!key.traits().is_string) {
         throw XmlSerializationException("XmlSerializer map key is not a string");
     }
-    auto tag = XmlSerializer::to_string(key);
+    auto tag = serde_xml::to_string(key);
     stream << "<" << tag << ">";
     open_tags.push(std::move(tag));
 }
@@ -119,4 +120,5 @@ void XmlSerializer::struct_skip_field(serde::string_view name) {
 void XmlSerializer::struct_end() {
 }
 
+}  // namespace serde_xml
 }  // namespace kingw

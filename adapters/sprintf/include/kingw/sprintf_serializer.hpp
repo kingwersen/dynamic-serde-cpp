@@ -4,6 +4,7 @@
 
 
 namespace kingw {
+namespace serde_sprintf {
 
 class SPrintfSerializer :
     public ser::Serializer
@@ -13,20 +14,6 @@ public:
     public:
         explicit SPrintfSerializationException(serde::string_view message);
     };
-
-    template <class T>
-    static char* to_buffer(const T & item, char* buffer_begin, char* buffer_end, bool human_readable = true) {
-        SPrintfSerializer serializer(buffer_begin, buffer_end, human_readable);
-        ser::serialize(serializer, item);
-        return serializer.last_end();
-    }
-
-    template <class T, std::size_t N>
-    static char* to_buffer(const T & item, char (&buffer)[N], bool human_readable = true) {
-        SPrintfSerializer serializer(buffer, buffer + N, human_readable);
-        ser::serialize(serializer, item);
-        return serializer.last_end();
-    }
 
     SPrintfSerializer(char* buffer_begin, char* buffer_end, bool human_readable = true);
     bool is_human_readable() const override;
@@ -83,4 +70,19 @@ private:
     bool human_readable;
 };
 
+template <class T>
+char* to_buffer(const T & input, char* buffer_begin, char* buffer_end, bool human_readable = true) {
+    SPrintfSerializer serializer(buffer_begin, buffer_end, human_readable);
+    ser::serialize(serializer, input);
+    return serializer.last_end();
+}
+
+template <class T, std::size_t N>
+char* to_buffer(const T & input, char (&buffer)[N], bool human_readable = true) {
+    SPrintfSerializer serializer(buffer, buffer + N, human_readable);
+    ser::serialize(serializer, input);
+    return serializer.last_end();
+}
+
+}  // namespace serde_sprintf
 }  // namespace kingw
