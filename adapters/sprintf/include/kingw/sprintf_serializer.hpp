@@ -15,21 +15,22 @@ public:
     };
 
     template <class T>
-    static char* to_buffer(const T & item, char * buffer, std::size_t len, bool human_readable = true) {
-        SPrintfSerializer serializer(buffer, len, human_readable);
+    static char* to_buffer(const T & item, char* buffer_begin, char* buffer_end, bool human_readable = true) {
+        SPrintfSerializer serializer(buffer_begin, buffer_end, human_readable);
         ser::serialize(serializer, item);
-        return serializer.buffer;
+        return serializer.last_end();
     }
 
     template <class T, std::size_t N>
     static char* to_buffer(const T & item, char (&buffer)[N], bool human_readable = true) {
-        SPrintfSerializer serializer(buffer, N, human_readable);
+        SPrintfSerializer serializer(buffer, buffer + N, human_readable);
         ser::serialize(serializer, item);
-        return serializer.buffer;
+        return serializer.last_end();
     }
 
-    SPrintfSerializer(char * buffer, std::size_t len, bool human_readable = true);
+    SPrintfSerializer(char* buffer_begin, char* buffer_end, bool human_readable = true);
     bool is_human_readable() const override;
+    char* last_end() const;
 
     // Basic Types
     void serialize_bool(bool value) override;
@@ -44,8 +45,7 @@ public:
     void serialize_f32(float value) override;
     void serialize_f64(double value) override;
     void serialize_char(char value) override;
-    void serialize_c_str(const char * value) override;
-    void serialize_string(const std::string & value) override;
+    void serialize_string(const char* begin, const char* end) override;
 
 protected:
     // Lists/Sequences
@@ -69,11 +69,17 @@ protected:
     void struct_skip_field(const char * name) override;
     void struct_end() override;
 
-private:
-    void handle_snprintf_return(int count);
+    struct Buffer {
+        char* begin;
+        char* end;
+        std::size_t size() const;
+    };
 
-    char * buffer;
-    std::size_t len;
+private:
+    void advance(std::size_t distance);
+
+    Buffer buffer;
+    char* last_end_;
     bool human_readable;
 };
 

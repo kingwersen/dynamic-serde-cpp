@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 #include <stdexcept>
 
 #include "kingw/ser/serialize.hpp"
@@ -36,8 +35,7 @@ public:
     virtual void serialize_f32(float value) = 0;
     virtual void serialize_f64(double value) = 0;
     virtual void serialize_char(char value) = 0;
-    virtual void serialize_c_str(const char * value) = 0;
-    virtual void serialize_string(const std::string & value) = 0;
+    virtual void serialize_string(const char * begin, const char* end) = 0;
 
     class SerializeSeq
     {

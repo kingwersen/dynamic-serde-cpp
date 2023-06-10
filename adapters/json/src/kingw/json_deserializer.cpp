@@ -118,7 +118,8 @@ void JsonDeserializer::deserialize_char(de::Visitor & visitor) {
 void JsonDeserializer::deserialize_string(de::Visitor & visitor) {
     auto & json = json_stack.top();
     if (json.is_string()) {
-        visitor.visit_string(json);
+        std::string value = json;
+        visitor.visit_string(value.begin().base(), value.end().base());
     } else {
         throw JsonDeserializationException("json value was not a string");
     }

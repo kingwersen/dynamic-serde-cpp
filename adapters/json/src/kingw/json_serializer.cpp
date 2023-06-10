@@ -12,6 +12,10 @@ JsonSerializer::JsonSerializer() {
     json_stack.push({});
 }
 
+bool JsonSerializer::is_human_readable() const {
+    return true;
+}
+
 std::string JsonSerializer::dump() const {
     if (json_stack.size() == 1) {
         return json_stack.top().dump();
@@ -20,10 +24,6 @@ std::string JsonSerializer::dump() const {
         // serialize_seq(), _map(), _struct(), etc.
         throw JsonSerializationException("JsonSerializer internal data structure corrupted during serialization");
     }
-}
-
-bool JsonSerializer::is_human_readable() const {
-    return true;
 }
 
 void JsonSerializer::serialize_bool(bool value) {
@@ -62,11 +62,8 @@ void JsonSerializer::serialize_f64(double value) {
 void JsonSerializer::serialize_char(char value) {
     json_stack.top() = value;
 }
-void JsonSerializer::serialize_c_str(const char * value) {
-    json_stack.top() = value;
-}
-void JsonSerializer::serialize_string(const std::string & value) {
-    json_stack.top() = value;
+void JsonSerializer::serialize_string(const char * begin, const char * end) {
+    json_stack.top() = std::string(begin, end);
 }
 
 

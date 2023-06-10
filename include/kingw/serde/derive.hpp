@@ -208,9 +208,8 @@ struct StructDefinition<Struct> {
 
     /// @brief Obtain the `field_number` of the field named `field_name`, or 0
     /// @param field_name Name/identifier of the field
-    /// @param len Length of field_name
     /// @return A `field_number` (one-based index), or 0 if the field was not found
-    std::size_t index_of_field_name(const char* field_name, std::size_t len) const {
+    std::size_t index_of_field_name(const char* field_name) const {
         // No-op. Stop recursing.
         // Default value of 0 means that the field name was not found.
         return 0;
@@ -457,10 +456,9 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
     ///   4. result == 0 ?:no -> continue
     ///
     /// @param field_name Name/identifier of the field
-    /// @param len Length of field_name
     /// @return A `field_number` (one-based index), or 0 if the field was not found
-    std::size_t index_of_field_name(const char* field_name, std::size_t len) const {
-        std::size_t result = previous_fields.index_of_field_name(field_name, len);
+    std::size_t index_of_field_name(const char* field_name) const {
+        std::size_t result = previous_fields.index_of_field_name(field_name);
         if (result == 0 && std::strcmp(field_name, field.name) == 0) {
             result = field_number;
         }
@@ -534,8 +532,8 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
         /// @brief Extract this object from the Deserializer
         /// @param deserializer Deserializer to extract from
         void deserialize(de::Deserializer & deserializer) override {
-            // Get the field name. Should invoke either `visit_c_str()` or
-            //  `visit_string()` of this object, see definitions below.
+            // Get the field name. Should invoke `visit_string()` of
+            // this object, see definitions below.
             deserializer.deserialize_string(*this);
         }
 
@@ -555,15 +553,9 @@ struct StructDefinition<Struct, Field, PreviousFields...> {
 
         /// @brief Set `output` to the `field_number` of the field named `key`, or 0
         /// @param key Name/identifier of the field
-        /// @param len Length of key
-        void visit_c_str(const char* key, std::size_t len) override {
-            output = defn.index_of_field_name(key, len);
-        }
-
-        /// @brief Set `output` to the `field_number` of the field named `key`, or 0
-        /// @param key Name/identifier of the field
-        void visit_string(const std::string & key) override {
-            visit_c_str(key.c_str(), key.size());
+        /// @param key_end Length of key
+        void visit_string(const char* key, const char* key_end) override {
+            output = defn.index_of_field_name(key);
         }
     };
 };

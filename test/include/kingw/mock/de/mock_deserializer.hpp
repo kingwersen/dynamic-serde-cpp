@@ -58,7 +58,7 @@ public:
     MOCK_METHOD(void, visit_f32, (float), (override));
     MOCK_METHOD(void, visit_f64, (double), (override));
     MOCK_METHOD(void, visit_char, (char), (override));
-    MOCK_METHOD(void, visit_string, (const std::string &), (override));
+    MOCK_METHOD(void, visit_string, (const char*, const char*), (override));
     MOCK_METHOD(void, visit_seq, (Deserializer::SeqAccess &), (override));
     MOCK_METHOD(void, visit_map, (Deserializer::MapAccess &), (override));
 };

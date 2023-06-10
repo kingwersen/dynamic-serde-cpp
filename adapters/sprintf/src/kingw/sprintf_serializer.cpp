@@ -1,18 +1,23 @@
 #include "kingw/sprintf_serializer.hpp"
 
 #include <cstdio>
+#include <cstring>
 
 
 namespace kingw {
 
-SPrintfSerializer::SPrintfSerializationException::SPrintfSerializationException(const char * message)
+SPrintfSerializer::SPrintfSerializationException::SPrintfSerializationException(const char* message)
     : ser::SerializationException(message) { }
 
-SPrintfSerializer::SPrintfSerializer(char * buffer, std::size_t len, bool human_readable)
-    : buffer(buffer), len(len), human_readable(human_readable) { }
+SPrintfSerializer::SPrintfSerializer(char* buffer_begin, char* buffer_end, bool human_readable)
+    : buffer({ buffer_begin, buffer_end }), last_end_(buffer_begin), human_readable(human_readable) { }
 
 bool SPrintfSerializer::is_human_readable() const {
     return human_readable;
+}
+
+char* SPrintfSerializer::last_end() const {
+    return last_end_;
 }
 
 void SPrintfSerializer::serialize_bool(bool value) {
@@ -28,15 +33,11 @@ void SPrintfSerializer::serialize_i32(std::int32_t value) {
     serialize_i64(value);
 }
 void SPrintfSerializer::serialize_i64(std::int64_t value) {
-    int ret = std::snprintf(buffer, len, "%ld", value);
+    int ret = std::snprintf(buffer.begin, buffer.size(), "%ld", value);
     if (ret >= 0) {
-        if (ret < len) {
-            ret += 1;
-        }
-        buffer += ret;
-        len -= ret;
+        advance(ret);
     } else {
-        // TODO
+        throw SPrintfSerializationException("failed to serialize integer");
     }
 }
 void SPrintfSerializer::serialize_u8(std::uint8_t value) {
@@ -49,66 +50,39 @@ void SPrintfSerializer::serialize_u32(std::uint32_t value) {
     serialize_u64(value);
 }
 void SPrintfSerializer::serialize_u64(std::uint64_t value) {
-    int ret = std::snprintf(buffer, len, "%lu", value);
+    int ret = std::snprintf(buffer.begin, buffer.size(), "%lu", value);
     if (ret >= 0) {
-        if (ret < len) {
-            ret += 1;
-        }
-        buffer += ret;
-        len -= ret;
+        advance(ret);
     } else {
-        // TODO
+        throw SPrintfSerializationException("failed to serialize unsigned integer");
     }
 }
 void SPrintfSerializer::serialize_f32(float value) {
     serialize_f64(value);
 }
 void SPrintfSerializer::serialize_f64(double value) {
-    int ret = std::snprintf(buffer, len, "%lf", value);
+    int ret = std::snprintf(buffer.begin, buffer.size(), "%lf", value);
     if (ret >= 0) {
-        if (ret < len) {
-            ret += 1;
-        }
-        buffer += ret;
-        len -= ret;
+        advance(ret);
     } else {
-        // TODO
+        throw SPrintfSerializationException("failed to serialize floating point type");
     }
 }
 void SPrintfSerializer::serialize_char(char value) {
-    int ret = std::snprintf(buffer, len, "%c", value);
+    int ret = std::snprintf(buffer.begin, buffer.size(), "%c", value);
     if (ret >= 0) {
-        if (ret < len) {
-            ret += 1;
-        }
-        buffer += ret;
-        len -= ret;
+        advance(ret);
     } else {
-        // TODO
+        throw SPrintfSerializationException("failed to serialize character");
     }
 }
-void SPrintfSerializer::serialize_c_str(const char * value) {
-    int ret = std::snprintf(buffer, len, "%s", value);
-    if (ret >= 0) {
-        if (ret < len) {
-            ret += 1;
-        }
-        buffer += ret;
-        len -= ret;
+void SPrintfSerializer::serialize_string(const char* begin, const char* end) {
+    std::size_t distance = end - begin;
+    if (distance <= buffer.size()) {
+        std::copy(begin, end, buffer.begin);
+        advance(distance);
     } else {
-        // TODO
-    }
-}
-void SPrintfSerializer::serialize_string(const std::string & value) {
-    int ret = std::snprintf(buffer, len, "%s", value.c_str());
-    if (ret >= 0) {
-        if (ret < len) {
-            ret += 1;
-        }
-        buffer += ret;
-        len -= ret;
-    } else {
-        // TODO
+        throw SPrintfSerializationException("failed to serialize string - too long");
     }
 }
 
@@ -183,7 +157,7 @@ void SPrintfSerializer::struct_begin(const char* name, std::size_t len) {
 }
 
 void SPrintfSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
-    serialize_c_str(name);
+    serialize_string(name, name + std::strlen(name));
     field.serialize(*this);
 }
 
@@ -193,6 +167,27 @@ void SPrintfSerializer::struct_skip_field(const char * name) {
 
 void SPrintfSerializer::struct_end() {
     // No-op
+}
+
+std::size_t SPrintfSerializer::Buffer::size() const {
+    return end - begin;
+}
+
+void SPrintfSerializer::advance(std::size_t distance) {
+    auto size_ = buffer.size();
+    if (distance < size_) {
+        // Always delimit sprintf() calls with '\0'.
+        last_end_ = buffer.begin + distance;
+        buffer.begin[distance] = '\0';
+        buffer.begin += (distance) + 1;
+    } else {
+        if (distance > size_) {
+            // Sanity check against OOB.
+            distance = size_;
+        }
+        last_end_ = buffer.begin + distance;
+        buffer.begin += distance;
+    }
 }
 
 }  // namespace kingw

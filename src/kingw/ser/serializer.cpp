@@ -139,7 +139,7 @@ void serialize<char>(Serializer & serializer, const char & data) {
 }
 template <>
 void serialize<std::string>(Serializer & serializer, const std::string & data) {
-    serializer.serialize_string(data);
+    serializer.serialize_string(data.data(), data.data() + data.size());
 }
 
 }

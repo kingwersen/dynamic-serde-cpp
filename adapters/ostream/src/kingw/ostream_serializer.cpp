@@ -1,5 +1,7 @@
 #include "kingw/ostream_serializer.hpp"
 
+#include <cstring>
+
 
 namespace kingw {
 
@@ -46,11 +48,8 @@ void OStreamSerializer::serialize_f64(double value) {
 void OStreamSerializer::serialize_char(char value) {
     stream << value;
 }
-void OStreamSerializer::serialize_c_str(const char * value) {
-    stream << value;
-}
-void OStreamSerializer::serialize_string(const std::string & value) {
-    stream << value;
+void OStreamSerializer::serialize_string(const char* begin, const char* end) {
+    stream.write(begin, end - begin);
 }
 
 
@@ -106,7 +105,8 @@ void OStreamSerializer::struct_begin(const char* name, std::size_t len) {
 }
 
 void OStreamSerializer::struct_serialize_field(const char * name, const ser::Serialize & field) {
-    serialize_c_str(name);
+    std::size_t len = std::strlen(name);
+    serialize_string(name, name + len);
     field.serialize(*this);
 }
 

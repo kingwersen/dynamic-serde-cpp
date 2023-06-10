@@ -23,8 +23,7 @@ public:
     MOCK_METHOD(void, serialize_f32, (float), (override));
     MOCK_METHOD(void, serialize_f64, (double), (override));
     MOCK_METHOD(void, serialize_char, (char), (override));
-    MOCK_METHOD(void, serialize_c_str, (const char*), (override));
-    MOCK_METHOD(void, serialize_string, (const std::string &), (override));
+    MOCK_METHOD(void, serialize_string, (const char*, const char*), (override));
     MOCK_METHOD(void, seq_begin, (std::size_t), (override));
     MOCK_METHOD(void, seq_serialize_element, (const Serialize &), (override));
     MOCK_METHOD(void, seq_end, (), (override));

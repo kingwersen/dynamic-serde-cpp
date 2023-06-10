@@ -328,8 +328,7 @@ public:
     virtual void visit_f32(float value);
     virtual void visit_f64(double value);
     virtual void visit_char(char value);
-    virtual void visit_c_str(const char* value, std::size_t len = -1);
-    virtual void visit_string(const std::string & value);
+    virtual void visit_string(const char* begin, const char* end);
     virtual void visit_seq(Deserializer::SeqAccess & value);
     virtual void visit_map(Deserializer::MapAccess & value);
 };

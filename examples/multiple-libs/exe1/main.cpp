@@ -33,7 +33,7 @@ int main() {
     // SPrintfSerializer (low level string manipulation)
     //
     char buffer[128] = {};
-    char* end = kingw::SPrintfSerializer::to_buffer(data, buffer, sizeof(buffer));
+    char* end = kingw::SPrintfSerializer::to_buffer(data, std::begin(buffer), std::end(buffer));
 
     std::cout << "SPrintfSerializer output: ";
     for (char* iter = buffer; iter < end; ++iter) {
@@ -42,7 +42,7 @@ int main() {
     std::cout << "\n";
 
     MyStruct data4;
-    kingw::SPrintfDeserializer::from_buffer(data4, buffer);
+    kingw::SPrintfDeserializer::from_buffer(data4, std::begin(buffer), std::end(buffer));
     std::cout << "SPrintfDeserializer output: " << data4.value2 << "\n";
 
     return 0;

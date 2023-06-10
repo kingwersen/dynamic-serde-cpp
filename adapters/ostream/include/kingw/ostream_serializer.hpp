@@ -20,11 +20,6 @@ public:
         return stream.str();
     }
 
-    template <class T>
-    void serialize(const T & item) {
-        ser::serialize(*this, item);
-    }
-
     explicit OStreamSerializer(std::ostream & stream, bool human_readable = true);
     bool is_human_readable() const override;
 
@@ -41,8 +36,7 @@ public:
     void serialize_f32(float value) override;
     void serialize_f64(double value) override;
     void serialize_char(char value) override;
-    void serialize_c_str(const char * value) override;
-    void serialize_string(const std::string & value) override;
+    void serialize_string(const char* begin, const char* end) override;
 
 protected:
     // Lists/Sequences

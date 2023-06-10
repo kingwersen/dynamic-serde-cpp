@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
 #include "kingw/de/deserializer.hpp"
 
@@ -260,8 +259,8 @@ public:
 
 /// @brief Default char Visitor
 ///
-/// Accepts visit_char(), visit_c_string(), or visit_string().
-/// If the latter two, then the string must have exactly one character.
+/// Accepts visit_char() or visit_string().
+/// If the latter, then the string must have exactly one character.
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<char>().
@@ -271,39 +270,36 @@ public:
     explicit CharVisitor(char & output);
     const char* expecting() const override;
     void visit_char(char value) override;
-    void visit_c_str(const char* value, std::size_t len = -1) override;
-    void visit_string(const std::string & value) override;
+    void visit_string(const char* begin, const char* end) override;
 };
 
-/// @brief Default std::string Visitor
+/// @brief Default String Visitor
 ///
-/// Only visit_c_str() and visit_string() are accepted.
-/// @see kingw::de::Visitor for usage info.
-///
-/// Used in the default implementation of deserialize<std::string>().
-class StringVisitor : public Visitor {
-public:
-    std::string & output;
-    explicit StringVisitor(std::string & output);
-    const char* expecting() const override;
-    void visit_c_str(const char* value, std::size_t len = -1) override;
-    void visit_string(const std::string & value) override;
-};
-
-/// @brief Default c-string Visitor
-///
-/// Only visit_c_str() and visit_string() are accepted.
+/// Only visit_string() is accepted.
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<char[N]>().
-class CStringVisitor : public Visitor {
+class StringVisitor : public Visitor {
 public:
-    char* output;
-    std::size_t output_len;
-    explicit CStringVisitor(char* output, std::size_t output_len);
+    char* output_begin;
+    char* output_end;
+    explicit StringVisitor(char* output_begin, char* output_end);
     const char* expecting() const override;
-    void visit_c_str(const char* value, std::size_t len = -1) override;
-    void visit_string(const std::string & value) override;
+    void visit_string(const char* begin, const char* end) override;
+};
+
+/// @brief Default String Visitor
+///
+/// Only visit_string() is accepted.
+/// @see kingw::de::Visitor for usage info.
+///
+/// Used in the default implementation of deserialize<char[N]>().
+class StdStringVisitor : public Visitor {
+public:
+    std::string & output;
+    explicit StdStringVisitor(std::string & output);
+    const char* expecting() const override;
+    void visit_string(const char* begin, const char* end) override;
 };
 
 }  // namespace de

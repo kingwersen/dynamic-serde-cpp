@@ -43,8 +43,7 @@ void Visitor::visit_u64(std::uint64_t value) { throw NotImplementedException("vi
 void Visitor::visit_f32(float value) { throw NotImplementedException("visitor unexpected type f32"); }
 void Visitor::visit_f64(double value) { throw NotImplementedException("visitor unexpected type f64"); }
 void Visitor::visit_char(char value) { throw NotImplementedException("visitor unexpected type char"); }
-void Visitor::visit_string(const std::string & value) { throw NotImplementedException("visitor unexpected type string"); }
-void Visitor::visit_c_str(const char* buffer, std::size_t len) { throw NotImplementedException("visitor unexpected type c string"); }
+void Visitor::visit_string(const char* begin, const char* end) { throw NotImplementedException("visitor unexpected type string"); }
 void Visitor::visit_seq(Deserializer::SeqAccess & value) { throw NotImplementedException("visitor unexpected type seq"); }
 void Visitor::visit_map(Deserializer::MapAccess & value) { throw NotImplementedException("visitor unexpected type map"); }
 
@@ -233,49 +232,35 @@ const char* CharVisitor::expecting() const {
 void CharVisitor::visit_char(char value) {
     output = value;
 }
-void CharVisitor::visit_c_str(const char* value, std::size_t len) {
-    if (len == -1) { len = std::strlen(value); }
-    if (len == 1) {
-        output = value[0];
-    } else {
-        throw DeserializationException("string does not contain exactly one character");
-    }
-}
-void CharVisitor::visit_string(const std::string & value) {
-    if (value.size() == 1) {
-        output = value[0];
+void CharVisitor::visit_string(const char* begin, const char* end) {
+    if (end - begin == 1) {
+        output = begin[0];
     } else {
         throw DeserializationException("string does not contain exactly one character");
     }
 }
 
-StringVisitor::StringVisitor(std::string & output)
-    : output(output) { }
+StringVisitor::StringVisitor(char* output_begin, char* output_end)
+    : output_begin(output_begin), output_end(output_end) { }
 const char* StringVisitor::expecting() const {
     return "a string";
 }
-void StringVisitor::visit_c_str(const char* value, std::size_t len) {
-    visit_string(value);
-}
-void StringVisitor::visit_string(const std::string & value) {
-    output = value;
-}
-
-CStringVisitor::CStringVisitor(char* output, std::size_t output_len)
-    : output(output), output_len(output_len) { }
-const char* CStringVisitor::expecting() const {
-    return "a string";
-}
-void CStringVisitor::visit_c_str(const char* value, std::size_t len) {
-    if (len == -1) { len = std::strlen(value); }
-    if (len <= output_len) {
-        std::snprintf(output, output_len, "%s", value);
+void StringVisitor::visit_string(const char* begin, const char* end) {
+    if ((end - begin) <= (output_end - output_begin)) {
+        char* copy_end = std::copy(begin, end, output_begin);
+        std::fill(copy_end, output_end, '\0');
     } else {
         throw DeserializationException("deserialized string doesn't fit in fixed-size buffer");
     }
 }
-void CStringVisitor::visit_string(const std::string & value) {
-    visit_c_str(value.c_str(), value.size());
+
+StdStringVisitor::StdStringVisitor(std::string & output)
+    : output(output) { }
+const char* StdStringVisitor::expecting() const {
+    return "a string";
+}
+void StdStringVisitor::visit_string(const char* begin, const char* end) {
+    output = std::string(begin, end);
 }
 
 
@@ -345,7 +330,7 @@ void deserialize<char>(Deserializer & deserializer, char & data) {
 }
 template <>
 void deserialize<std::string>(Deserializer & deserializer, std::string & data) {
-    StringVisitor visitor(data);
+    StdStringVisitor visitor(data);
     deserializer.deserialize_string(visitor);
 }
 

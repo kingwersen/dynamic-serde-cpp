@@ -27,8 +27,8 @@ void ser::serialize<Timestamp>(ser::Serializer & serializer, const Timestamp & t
         std::size_t len = std::strftime(buffer, buffer_len, "%FT%T", &tp);
 
         // Append milliseconds manually since std::strftime doesn't support it.
-        std::snprintf(buffer + len, buffer_len - len, ".%ldZ", milliseconds % 1000);
-        serializer.serialize_c_str(buffer);
+        len += std::snprintf(buffer + len, buffer_len - len, ".%ldZ", milliseconds % 1000);
+        serializer.serialize_string(buffer, buffer + len);
     } else {
         // Serialize the timestamp as the number of milliseconds since 1970-01-01 UTC.
         serializer.serialize_i64(milliseconds);
@@ -70,14 +70,11 @@ namespace {
         /// Supports up to nanoseconds accuracy (optional).
         ///
         /// @param buffer Pointer to character array
-        /// @param len Length of character array
-        void visit_c_str(const char* buffer, std::size_t len = -1) override {
-            if (len == -1) {
-                len = std::strlen(buffer);
-            }
+        /// @param buffer_end End of character array
+        void visit_string(const char* buffer, const char* buffer_end) override {
             // Verify the end of the string has a Z.
             // Now we can use 'Z' as the sentinel instead of len or '\0'.
-            if (len > 0 && buffer[len-1] != 'Z') {
+            if (buffer == buffer_end || buffer_end[-1] != 'Z') {
                 throw de::DeserializationException("failed to parse timestamp from string");
             }
 
@@ -108,13 +105,6 @@ namespace {
             } else {
                 throw de::DeserializationException("failed to parse timestamp from string");
             }
-        }
-
-        /// @brief Parse a calendar timestamp from a string
-        /// @see visit_c_str() for implementation
-        /// @param value String to parse
-        void visit_string(const std::string & value) override {
-            visit_c_str(value.c_str(), value.size());
         }
     };
 }

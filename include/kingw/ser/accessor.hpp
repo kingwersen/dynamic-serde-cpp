@@ -41,7 +41,7 @@ Accessor<T> accessor(const T & item) {
 template <class T, std::size_t N>
 void serialize(Serializer & serializer, const T (&data)[N]) {
     if (std::is_same<T, char>::value) {
-        serializer.serialize_c_str(data);
+        serializer.serialize_string(data, data + N);
     } else {
         auto seq = serializer.serialize_seq(N);
         for (const auto & element : data) {
