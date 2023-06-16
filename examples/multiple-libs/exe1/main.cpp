@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "kingw/serde/templates/stdmap.hpp"
 #include "kingw/serde_sprintf.hpp"
 #include "kingw/serde_json.hpp"
 #include "kingw/serde_xml.hpp"

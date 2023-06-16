@@ -97,7 +97,24 @@ protected:
     virtual void struct_end() = 0;
 };
 
+template <class T>
+class Accessor : public Serialize {
+public:
+    explicit Accessor(const T & item) : item(item) { }
+    void serialize(Serializer & serializer) const override {
+        ser::serialize(serializer, item);
+    }
+    serde::TypeTraits traits() const override {
+        return serde::TypeTraits::of<T>();
+    };
+private:
+    const T & item;
+};
+
+template <class T>
+Accessor<T> accessor(const T & item) {
+    return Accessor<T>(item);
+}
+
 }  // namespace ser
 }  // namespace kingw
-
-#include "kingw/ser/accessor.hpp"

@@ -334,18 +334,52 @@ public:
     virtual void visit_map(Deserializer::MapAccess & value);
 };
 
+
+/// @brief Generic `Deserialize` implementation that defers to `de::deserialize<T>()`.
+///
+/// This Serde implementation uses dynamic dispatch to reduce compilation
+/// overhead. If your class does not inherit from `Deserialize`, then you
+/// will be required to use this class to use a `Deserializer`.
+///
+/// `de::accessor(item)` is a helper function that avoids having to write 
+/// the template type.
+///
+/// @tparam T Type of object to deserialize
+template <class T>
+class Accessor : public de::Deserialize {
+public:
+    /// @brief de::Accessor Constructor
+    /// @param output Reference of variable to deserialize into
+    explicit Accessor(T & output) : output(output) {
+    }
+
+    /// @brief Invoke `de::deserialize<T>()`
+    /// @param deserializer Deserializer to extract from
+    void deserialize(Deserializer & deserializer) override {
+        de::deserialize(deserializer, output);
+    }
+
+    /// @brief Get the traits of type T
+    /// @return `TypeTraits::of<T>()`
+    serde::TypeTraits traits() const override {
+        return serde::TypeTraits::of<T>();
+    };
+
+private:
+    /// @brief Reference of variable to deserialize into
+    T & output;
+};
+
+/// @brief Helper function to construct `de::Accessor<T>`
+/// Avoids having to write the template type during construction.
+/// @tparam T Type of object to deserialize
+/// @param output Reference of variable to deserialize into
+/// @return `de::Accessor<T>`
+template <class T>
+Accessor<T> accessor(T & output) {
+    return Accessor<T>(output);
+}
+
+
 }  // namespace de
 }  // namespace kingw
-
-// This include contains `deserialize()` template specializations
-// for std::vector<T>, std::map<K, V>, and others. Unfortunately due
-// to template limitations you'll end up with linker errors if you
-// forget to include this. Furthermore, due to tight coupling,
-// this it can't be included before `Deserializer` is defined either.
-//
-// For simplicity I have chosen to always include this after this file.
-// Not sure of a better solution at the moment, other than copying
-// its contents into this file.
-//
-// TODO: Fix linker errors when "kingw/de/accessor.hpp" is missing
-#include "kingw/de/accessor.hpp"

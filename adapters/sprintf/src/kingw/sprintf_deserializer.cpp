@@ -1,7 +1,5 @@
 #include "kingw/sprintf_deserializer.hpp"
 
-#include "kingw/de/accessor.hpp"
-
 
 namespace kingw {
 namespace serde_sprintf {
