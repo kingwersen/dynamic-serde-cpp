@@ -43,15 +43,15 @@ template <class T> struct B { T value; };
 
 // Define serialize() for A, then B
 template <class T>
-ser::serialize<A<T>>(ser::Serializer & serializer, const A<T> & input) {
+ser::serialize(ser::Serializer & serializer, const A<T> & input) {
     ser::serialize(serializer, input.value);
 }
 template <class T>
-ser::serialize<B<T>>(ser::Serializer & serializer, const B<T> & input) {
+ser::serialize(ser::Serializer & serializer, const B<T> & input) {
     ser::serialize(serializer, input.value);
 }
 
-ser::serialize(serializer, A<B<int>>{ { 5 } });  // Linker Error
+ser::serialize(serializer, A<B<int>>{ { 5 } });  // Linker Error - serialize<B<int>>()
 ser::serialize(serializer, B<A<int>>{ { 5 } });  // OK
 ```
 ```c++
@@ -60,19 +60,20 @@ template <class T> struct B { T value; };
 
 // Define serialize() for B, then A
 template <class T>
-ser::serialize<B<T>>(ser::Serializer & serializer, const B<T> & input) {
+ser::serialize(ser::Serializer & serializer, const B<T> & input) {
     ser::serialize(serializer, input.value);
 }
 template <class T>
-ser::serialize<A<T>>(ser::Serializer & serializer, const A<T> & input) {
+ser::serialize(ser::Serializer & serializer, const A<T> & input) {
     ser::serialize(serializer, input.value);
 }
 
 ser::serialize(serializer, A<B<int>>{ { 5 } });  // OK
-ser::serialize(serializer, B<A<int>>{ { 5 } });  // Linker Error
+ser::serialize(serializer, B<A<int>>{ { 5 } });  // Linker Error - serialize<A<int>>()
 ```
+This is because template functions do not support partial specialization. I cannot do ``template <class T> ser::serialize<A<T>>(const A<T> & value) { ... }``, only ``template <class T> ser::serialize(const A<T> & value) { ... }``. The latter is a completely different function signature than the original, and since it wasn't declared before it was referenced in another serialize() implementation, the original, non-template implementation ``template <> serialize<A<int>>()`` is used instead. This is non-template implementation is never defined and is what throws the linker error.
 
-If I replace ``serialize<T>()`` with ``Serde<T>::serialize()``, this issue is actually resolved. However, the struct functions are never written to libraries. As a result, this is a 100% header-only solution and is not usable in our library-based solution. All Serde implementations, including integral types like integers, must be included everywhere:
+Interestingly, I can actually resolve this issue if I replace ``serialize<T>()`` with ``Serde<T>::serialize()`` (a template struct w/ a static function). This appears to cause the C++ compiler to defer template resolution until the template is used instead of when the template is defined (?). However, the struct functions are never written to libraries. As a result, this is a 100% header-only solution and is not usable in our library-based solution. All Serde implementations, including integral types like integers, must be included everywhere:
 ```c++
 template <class T> struct A { T value; };
 template <class T> struct B { T value; };
@@ -96,13 +97,15 @@ Serde<A<B<int>>>::serialize(serializer, A<B<int>>{ { 5 } });  // OK
 Serde<B<A<int>>>::serialize(serializer, B<A<int>>{ { 5 } });  // OK
 ```
 
-There are other frustrating problems too around include ordering.
+There are other frustrating problems that revolve around include ordering and are unique to this library-based implementation:
 ```c++
 // Must include stdvector.hpp first or from_string() throws a linker error.
 #include "kingw/serde/templates/stdvector.hpp"
 #include "kingw/serde_json.hpp"
 serde_json::from_string(std::vector<int>{ 1, 2, 3 });
 ```
+
+The apparent solution is to use a header only implementation. Injae already has one here: [serdepp](https://github.com/injae/serdepp/tree/main).
 
 
 ## Basic Usage
