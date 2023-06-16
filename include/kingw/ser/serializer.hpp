@@ -41,12 +41,12 @@ public:
     class SerializeSeq
     {
     public:
-        SerializeSeq(Serializer & serializer, std::size_t len);
+        SerializeSeq(ser::Serializer & serializer, std::size_t len);
         ~SerializeSeq();
-        void serialize_element(const Serialize & accessor);
+        void serialize_element(const ser::Serialize & accessor);
         void end();
     private:
-        Serializer & serializer;
+        ser::Serializer & serializer;
         bool closed = false;
     };
     virtual SerializeSeq serialize_seq(std::size_t len = UNKNOWN_LENGTH);
@@ -54,14 +54,14 @@ public:
     class SerializeMap
     {
     public:
-        SerializeMap(Serializer & serializer, std::size_t len);
+        SerializeMap(ser::Serializer & serializer, std::size_t len);
         ~SerializeMap();
-        void serialize_key(const Serialize & key);
-        void serialize_value(const Serialize & value);
-        void serialize_entry(const Serialize & key, const Serialize & value);
+        void serialize_key(const ser::Serialize & key);
+        void serialize_value(const ser::Serialize & value);
+        void serialize_entry(const ser::Serialize & key, const ser::Serialize & value);
         void end();
     private:
-        Serializer & serializer;
+        ser::Serializer & serializer;
         bool closed = false;
     };
     virtual SerializeMap serialize_map(std::size_t len = UNKNOWN_LENGTH);
@@ -69,30 +69,30 @@ public:
     class SerializeStruct
     {
     public:
-        SerializeStruct(Serializer & serializer, serde::string_view name, std::size_t len);
+        SerializeStruct(ser::Serializer & serializer, serde::string_view name, std::size_t len);
         ~SerializeStruct();
         void serialize_field(serde::string_view name, const Serialize & accessor);
         void skip_field(serde::string_view name);
         void end();
     private:
-        Serializer & serializer;
+        ser::Serializer & serializer;
         bool closed = false;
     };
     virtual SerializeStruct serialize_struct(serde::string_view name, std::size_t len = UNKNOWN_LENGTH);
 
 protected:
     virtual void seq_begin(std::size_t len) = 0;
-    virtual void seq_serialize_element(const Serialize & accessor) = 0;
+    virtual void seq_serialize_element(const ser::Serialize & accessor) = 0;
     virtual void seq_end() = 0;
 
     virtual void map_begin(std::size_t len) = 0;
-    virtual void map_serialize_key(const Serialize & accessor) = 0;
-    virtual void map_serialize_value(const Serialize & accessor) = 0;
-    virtual void map_serialize_entry(const Serialize & key, const Serialize & value) = 0;
+    virtual void map_serialize_key(const ser::Serialize & accessor) = 0;
+    virtual void map_serialize_value(const ser::Serialize & accessor) = 0;
+    virtual void map_serialize_entry(const ser::Serialize & key, const ser::Serialize & value) = 0;
     virtual void map_end() = 0;
 
     virtual void struct_begin(serde::string_view name, std::size_t len) = 0;
-    virtual void struct_serialize_field(serde::string_view name, const Serialize & accessor) = 0;
+    virtual void struct_serialize_field(serde::string_view name, const ser::Serialize & accessor) = 0;
     virtual void struct_skip_field(serde::string_view name) = 0;
     virtual void struct_end() = 0;
 };
@@ -101,7 +101,7 @@ template <class T>
 class Accessor : public Serialize {
 public:
     explicit Accessor(const T & item) : item(item) { }
-    void serialize(Serializer & serializer) const override {
+    void serialize(ser::Serializer & serializer) const override {
         ser::serialize(serializer, item);
     }
     serde::TypeTraits traits() const override {

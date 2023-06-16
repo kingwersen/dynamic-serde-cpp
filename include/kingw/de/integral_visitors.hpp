@@ -15,7 +15,7 @@ namespace de {
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<bool>().
-class BoolVisitor : public Visitor {
+class BoolVisitor : public de::Visitor {
 public:
     bool & output;
     explicit BoolVisitor(bool & output);
@@ -39,7 +39,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::int8_t>().
-class I8Visitor : public Visitor {
+class I8Visitor : public de::Visitor {
 public:
     std::int8_t & output;
     explicit I8Visitor(std::int8_t & output);
@@ -61,7 +61,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::int16_t>().
-class I16Visitor : public Visitor {
+class I16Visitor : public de::Visitor {
 public:
     std::int16_t & output;
     explicit I16Visitor(std::int16_t & output);
@@ -83,7 +83,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::int32_t>().
-class I32Visitor : public Visitor {
+class I32Visitor : public de::Visitor {
 public:
     std::int32_t & output;
     explicit I32Visitor(std::int32_t & output);
@@ -105,7 +105,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::int64_t>().
-class I64Visitor : public Visitor {
+class I64Visitor : public de::Visitor {
 public:
     std::int64_t & output;
     explicit I64Visitor(std::int64_t & output);
@@ -127,7 +127,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::uint8_t>().
-class U8Visitor : public Visitor {
+class U8Visitor : public de::Visitor {
 public:
     std::uint8_t & output;
     explicit U8Visitor(std::uint8_t & output);
@@ -149,7 +149,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::uint16_t>().
-class U16Visitor : public Visitor {
+class U16Visitor : public de::Visitor {
 public:
     std::uint16_t & output;
     explicit U16Visitor(std::uint16_t & output);
@@ -171,7 +171,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::uint32_t>().
-class U32Visitor : public Visitor {
+class U32Visitor : public de::Visitor {
 public:
     std::uint32_t & output;
     explicit U32Visitor(std::uint32_t & output);
@@ -193,7 +193,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<std::uint64_t>().
-class U64Visitor : public Visitor {
+class U64Visitor : public de::Visitor {
 public:
     std::uint64_t & output;
     explicit U64Visitor(std::uint64_t & output);
@@ -214,7 +214,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<float>().
-class F32Visitor : public Visitor {
+class F32Visitor : public de::Visitor {
 public:
     float & output;
     explicit F32Visitor(float & output);
@@ -237,7 +237,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<float>().
-class F64Visitor : public Visitor {
+class F64Visitor : public de::Visitor {
 public:
     double & output;
     explicit F64Visitor(double & output);
@@ -264,7 +264,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<char>().
-class CharVisitor : public Visitor {
+class CharVisitor : public de::Visitor {
 public:
     char & output;
     explicit CharVisitor(char & output);
@@ -279,7 +279,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<char[N]>().
-class StringVisitor : public Visitor {
+class StringVisitor : public de::Visitor {
 public:
     char* output_begin;
     char* output_end;
@@ -294,7 +294,7 @@ public:
 /// @see kingw::de::Visitor for usage info.
 ///
 /// Used in the default implementation of deserialize<char[N]>().
-class StdStringVisitor : public Visitor {
+class StdStringVisitor : public de::Visitor {
 public:
     std::string & output;
     explicit StdStringVisitor(std::string & output);

@@ -15,7 +15,7 @@ namespace de {
 ///
 /// @tparam T Vector element type
 template <class T>
-class StdVectorVisitor : public Visitor {
+class StdVectorVisitor : public de::Visitor {
 public:
     /// @brief StdVectorVisitor Constructor
     /// @param output Reference of variable to deserialize into
@@ -43,7 +43,7 @@ public:
     /// then call `accessor.deserialize()` to fill the data.
     ///
     /// @param seq Data from `Deserializer`
-    void visit_seq(Deserializer::SeqAccess & seq) override {
+    void visit_seq(de::Deserializer::SeqAccess & seq) override {
         while (seq.has_next()) {
             output.push_back({});
             de::Accessor<T> accessor(output.back());
@@ -65,7 +65,7 @@ private:
 /// @param deserializer Deserializer to extract from
 /// @param output Output location
 template <class T>
-void deserialize(Deserializer & deserializer, std::vector<T> & output) {
+void deserialize(de::Deserializer & deserializer, std::vector<T> & output) {
     StdVectorVisitor<T> visitor(output);
     deserializer.deserialize_seq(visitor);
 }
@@ -90,7 +90,7 @@ public:
 
     /// @brief Invoke `de::deserialize<T>()`
     /// @param deserializer Deserializer to extract from
-    void deserialize(Deserializer & deserializer) override {
+    void deserialize(de::Deserializer & deserializer) override {
         de::deserialize(deserializer, output);
     }
 

@@ -10,7 +10,7 @@ namespace kingw {
 namespace ser {
 
 template <class K, class V>
-void serialize(Serializer & serializer, const std::map<K, V> & data) {
+void serialize(ser::Serializer & serializer, const std::map<K, V> & data) {
     auto map = serializer.serialize_map(data.size());
     for (const auto & kvp : data) {
         map.serialize_entry(ser::accessor(kvp.first), ser::accessor(kvp.second));
@@ -19,10 +19,10 @@ void serialize(Serializer & serializer, const std::map<K, V> & data) {
 }
 
 template <class K, class V>
-class Accessor<std::map<K, V>> : public Serialize {
+class Accessor<std::map<K, V>> : public ser::Serialize {
 public:
     explicit Accessor(const std::map<K, V> & item) : item(item) { }
-    void serialize(Serializer & serializer) const override {
+    void serialize(ser::Serializer & serializer) const override {
         ser::serialize(serializer, item);
     }
     serde::TypeTraits traits() const override {

@@ -10,7 +10,7 @@ namespace kingw {
 namespace ser {
 
 template <class T>
-void serialize(Serializer & serializer, const std::vector<T> & data) {
+void serialize(ser::Serializer & serializer, const std::vector<T> & data) {
     auto seq = serializer.serialize_seq(data.size());
     for (const auto & element : data) {
         seq.serialize_element(ser::accessor(element));
@@ -19,10 +19,10 @@ void serialize(Serializer & serializer, const std::vector<T> & data) {
 }
 
 template <class T>
-class Accessor<std::vector<T>> : public Serialize {
+class Accessor<std::vector<T>> : public ser::Serialize {
 public:
     explicit Accessor(const std::vector<T> & item) : item(item) { }
-    void serialize(Serializer & serializer) const override {
+    void serialize(ser::Serializer & serializer) const override {
         ser::serialize(serializer, item);
     }
     serde::TypeTraits traits() const override {

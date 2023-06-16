@@ -17,7 +17,7 @@ namespace de {
 /// @tparam K Map key type
 /// @tparam V Map value type
 template <class K, class V>
-class StdMapVisitor : public Visitor {
+class StdMapVisitor : public de::Visitor {
 public:
     /// @brief StdMapVisitor Constructor
     /// @param output Reference of variable to deserialize into
@@ -46,7 +46,7 @@ public:
     /// value accessors to fill the data.
     ///
     /// @param seq Data from `Deserializer`
-    void visit_map(Deserializer::MapAccess & map) override {
+    void visit_map(de::Deserializer::MapAccess & map) override {
         while (map.has_next()) {
             K key{};
             V value{};
@@ -97,7 +97,7 @@ public:
 
     /// @brief Invoke `de::deserialize<T>()`
     /// @param deserializer Deserializer to extract from
-    void deserialize(Deserializer & deserializer) override {
+    void deserialize(de::Deserializer & deserializer) override {
         de::deserialize(deserializer, output);
     }
 

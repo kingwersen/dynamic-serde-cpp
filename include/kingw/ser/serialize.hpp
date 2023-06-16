@@ -45,7 +45,7 @@ class Serializer;
 /// @param serializer Serializer to insert into
 /// @param data Item to serialize
 template <class T>
-void serialize(Serializer & serializer, const T & data);
+void serialize(ser::Serializer & serializer, const T & data);
 
 /// @brief "Trait"/Interface for serializable types.
 ///
@@ -62,7 +62,7 @@ public:
 
     /// @brief Insert this object into the Serializer. 
     /// @param serializer Serializer to insert into
-    virtual void serialize(Serializer & serializer) const = 0;
+    virtual void serialize(ser::Serializer & serializer) const = 0;
 
     /// @brief Get type information for this object.
     /// You can usually `return TypeTraits::of<T>()`.

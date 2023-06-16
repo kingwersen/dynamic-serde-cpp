@@ -38,7 +38,7 @@ class Deserializer;
 /// @param deserializer Deserializer to extract from
 /// @param output Output location
 template <class T>
-void deserialize(Deserializer & deserializer, T & output);
+void deserialize(de::Deserializer & deserializer, T & output);
 
 /// @brief "Trait"/Interface for deserializable types.
 ///
@@ -55,7 +55,7 @@ public:
 
     /// @brief Extract this object from the Deserializer. 
     /// @param deserializer Deserializer to extract from
-    virtual void deserialize(Deserializer & deserializer) = 0;
+    virtual void deserialize(de::Deserializer & deserializer) = 0;
 
     /// @brief Get type information for this object.
     /// You can usually `return TypeTraits::of<T>()`.

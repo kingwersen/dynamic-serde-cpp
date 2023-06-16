@@ -134,25 +134,25 @@ public:
     /// info on visitor usage and an exmaple.
     ///
     /// @param visitor Handles the deserialized value
-    virtual void deserialize_any(Visitor & visitor) = 0;
-    virtual void deserialize_bool(Visitor & visitor) = 0;
-    virtual void deserialize_i8(Visitor & visitor) = 0;
-    virtual void deserialize_i16(Visitor & visitor) = 0;
-    virtual void deserialize_i32(Visitor & visitor) = 0;
-    virtual void deserialize_i64(Visitor & visitor) = 0;
-    virtual void deserialize_u8(Visitor & visitor) = 0;
-    virtual void deserialize_u16(Visitor & visitor) = 0;
-    virtual void deserialize_u32(Visitor & visitor) = 0;
-    virtual void deserialize_u64(Visitor & visitor) = 0;
-    virtual void deserialize_f32(Visitor & visitor) = 0;
-    virtual void deserialize_f64(Visitor & visitor) = 0;
-    virtual void deserialize_char(Visitor & visitor) = 0;
-    virtual void deserialize_string(Visitor & visitor) = 0;
-    virtual void deserialize_seq(Visitor & visitor) = 0;
-    virtual void deserialize_map(Visitor & visitor) = 0;
+    virtual void deserialize_any(de::Visitor & visitor) = 0;
+    virtual void deserialize_bool(de::Visitor & visitor) = 0;
+    virtual void deserialize_i8(de::Visitor & visitor) = 0;
+    virtual void deserialize_i16(de::Visitor & visitor) = 0;
+    virtual void deserialize_i32(de::Visitor & visitor) = 0;
+    virtual void deserialize_i64(de::Visitor & visitor) = 0;
+    virtual void deserialize_u8(de::Visitor & visitor) = 0;
+    virtual void deserialize_u16(de::Visitor & visitor) = 0;
+    virtual void deserialize_u32(de::Visitor & visitor) = 0;
+    virtual void deserialize_u64(de::Visitor & visitor) = 0;
+    virtual void deserialize_f32(de::Visitor & visitor) = 0;
+    virtual void deserialize_f64(de::Visitor & visitor) = 0;
+    virtual void deserialize_char(de::Visitor & visitor) = 0;
+    virtual void deserialize_string(de::Visitor & visitor) = 0;
+    virtual void deserialize_seq(de::Visitor & visitor) = 0;
+    virtual void deserialize_map(de::Visitor & visitor) = 0;
     virtual void deserialize_struct(serde::string_view struct_name,
         const FieldNames & field_names, 
-        Visitor & visitor) = 0;
+        de::Visitor & visitor) = 0;
 
     /// @brief Provides a Visitor access to each element of a sequence
     ///
@@ -187,7 +187,7 @@ public:
         /// the next item in the list.
         ///
         /// @param element Output location
-        virtual void next_element(Deserialize & element) = 0;
+        virtual void next_element(de::Deserialize & element) = 0;
     };
 
     /// @brief Provides a Visitor access to each element of a map
@@ -227,7 +227,7 @@ public:
         /// functionally equivalent. You can use whichever is easier.
         ///
         /// @param key Output location
-        virtual void next_key(Deserialize & key) = 0;
+        virtual void next_key(de::Deserialize & key) = 0;
 
         /// @brief Requests to deserialize the value for the current map entry
         ///
@@ -240,7 +240,7 @@ public:
         /// functionally equivalent. You can use whichever is easier.
         ///
         /// @param value Output location
-        virtual void next_value(Deserialize & value) = 0;
+        virtual void next_value(de::Deserialize & value) = 0;
 
         /// @brief Requests to deserialize the current map entry
         ///
@@ -254,7 +254,7 @@ public:
         ///
         /// @param key Output location
         /// @param value Output location
-        virtual void next_entry(Deserialize & key, Deserialize & value) = 0;
+        virtual void next_entry(de::Deserialize & key, de::Deserialize & value) = 0;
     };
 };
 
@@ -269,7 +269,7 @@ class Visitor
 {
 public:
     /// @brief Exception class thrown when a visitor call is not implemented
-    class NotImplementedException : public DeserializationException {
+    class NotImplementedException : public de::DeserializationException {
     public:
         /// @brief NotImplementedException Constructor
         /// @param message Cause of the exception
@@ -330,8 +330,8 @@ public:
     virtual void visit_f64(double value);
     virtual void visit_char(char value);
     virtual void visit_string(serde::string_view value);
-    virtual void visit_seq(Deserializer::SeqAccess & value);
-    virtual void visit_map(Deserializer::MapAccess & value);
+    virtual void visit_seq(de::Deserializer::SeqAccess & value);
+    virtual void visit_map(de::Deserializer::MapAccess & value);
 };
 
 
@@ -355,7 +355,7 @@ public:
 
     /// @brief Invoke `de::deserialize<T>()`
     /// @param deserializer Deserializer to extract from
-    void deserialize(Deserializer & deserializer) override {
+    void deserialize(de::Deserializer & deserializer) override {
         de::deserialize(deserializer, output);
     }
 
@@ -379,7 +379,6 @@ template <class T>
 Accessor<T> accessor(T & output) {
     return Accessor<T>(output);
 }
-
 
 }  // namespace de
 }  // namespace kingw
