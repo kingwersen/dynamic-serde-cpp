@@ -97,12 +97,12 @@ Serde<A<B<int>>>::serialize(serializer, A<B<int>>{ { 5 } });  // OK
 Serde<B<A<int>>>::serialize(serializer, B<A<int>>{ { 5 } });  // OK
 ```
 
-There are other frustrating problems that revolve around include ordering and are unique to this library-based implementation:
+There are other frustrating problems that revolve around include ordering, related to the aforementioned problem:
 ```c++
-// Must include stdvector.hpp first or from_string() throws a linker error.
+// Must include stdvector.hpp first or to_string() throws a linker error.
 #include "kingw/serde/templates/stdvector.hpp"
 #include "kingw/serde_json.hpp"
-serde_json::from_string(std::vector<int>{ 1, 2, 3 });
+serde_json::to_string(std::vector<int>{ 1, 2, 3 });
 ```
 
 The apparent solution is to use a header only implementation. Injae already has one here: [serdepp](https://github.com/injae/serdepp/tree/main).
