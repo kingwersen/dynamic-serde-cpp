@@ -1,4 +1,4 @@
-# dynamic-serde-cpp (wip)
+# dynamic-serde-cpp (:warning: discontinued)
 
 ![CI Status](https://github.com/kingwersen/dynamic-serde-cpp/actions/workflows/linux.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kingwersen_dynamic-serde-cpp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=kingwersen_dynamic-serde-cpp)
@@ -26,6 +26,83 @@ This library aims to solve compilation speed and size challenges when working wi
 You may find this library useful if you use a large, centralized data model. The data model can be compiled into an archive and passed around. By comparison, header-only implementations usually cannot be compiled into libraries.
 
 See [serdepp](https://github.com/injae/serdepp/tree/main) for a faster, header-only alternative.
+
+
+## :warning: Discontinuation Notice :warning:
+
+During development I found some significant logic gaps in the C++ compiler/linker that make this Serde implementation impractical. There are certain use cases that are impossible without taxing the end user.
+
+The goal was to compile Serde definitions into libraries which could be linked against. If you aren't using template types, this works great. However, template types get messy. Template types don't get compiled into libraries at all and must be included from a header file in every source file in which they're used. This normally wouldn't be a problem, but the Serde definitions can create circular dependencies, and since the implementations can't be compiled into a library, there's no practical way to resolve organize the definitions that prevents circular dependency errors. Technically, the user can declare all their template Serde implementations in advance, but this is totally impractical.
+
+The following example demonstrates this issue. Notice that there's a linker error no matter which way I choose to order the serialize() definitions:
+```c++
+template <class T> struct A { T value; };
+template <class T> struct B { T value; };
+
+// Define serialize() for A, then B
+template <class T>
+ser::serialize<A<T>>(ser::Serializer & serializer, const A<T> & input) {
+    ser::serialize(serializer, input.value);
+}
+template <class T>
+ser::serialize<B<T>>(ser::Serializer & serializer, const B<T> & input) {
+    ser::serialize(serializer, input.value);
+}
+
+ser::serialize(serializer, A<B<int>>{ { 5 } });  // Linker Error
+ser::serialize(serializer, B<A<int>>{ { 5 } });  // OK
+```
+```c++
+template <class T> struct A { T value; };
+template <class T> struct B { T value; };
+
+// Define serialize() for B, then A
+template <class T>
+ser::serialize<B<T>>(ser::Serializer & serializer, const B<T> & input) {
+    ser::serialize(serializer, input.value);
+}
+template <class T>
+ser::serialize<A<T>>(ser::Serializer & serializer, const A<T> & input) {
+    ser::serialize(serializer, input.value);
+}
+
+ser::serialize(serializer, A<B<int>>{ { 5 } });  // OK
+ser::serialize(serializer, B<A<int>>{ { 5 } });  // Linker Error
+```
+
+If I replace ``serialize<T>()`` with ``Serde<T>::serialize()``, this issue is actually resolved. However, the struct functions are never written to libraries. As a result, this is a 100% header-only solution and is not usable in our library-based solution. All Serde implementations, including integral types like integers, must be included everywhere:
+```c++
+template <class T> struct A { T value; };
+template <class T> struct B { T value; };
+
+// Define serialize() for A, then B
+template <class T>
+struct Serde<A<T>> {
+    static void serialize(ser::Serializer & serializer, const A<T> & input) {
+        Serde<T>::serialize(serializer, input.value);
+    }
+};
+template <class T>
+struct Serde<B<T>> {
+    static void serialize(ser::Serializer & serializer, const B<T> & input) {
+        Serde<T>::serialize(serializer, input.value);
+    }
+};
+
+// Order no longer matters
+Serde<A<B<int>>>::serialize(serializer, A<B<int>>{ { 5 } });  // OK
+Serde<B<A<int>>>::serialize(serializer, B<A<int>>{ { 5 } });  // OK
+```
+
+There are other frustrating problems too around include ordering.
+```c++
+// Must include stdvector.hpp first or from_string() throws a linker error.
+#include "kingw/serde/templates/stdvector.hpp"
+#include "kingw/serde_json.hpp"
+serde_json::from_string(std::vector<int>{ 1, 2, 3 });
+```
+
+I'd love to see if someone can figure this out. But I think I'm going to wait for C++ Modules to become popular and stick with those instead...
 
 
 ## Basic Usage
