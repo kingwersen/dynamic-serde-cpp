@@ -34,7 +34,7 @@ During development I found some significant logic gaps in the C++ compiler/linke
 
 This implementation is incomplete and I do not plan to finish it.
 
-The goal was to compile Serde definitions into libraries which could be linked against. If you aren't using template types, this works great. However, template types get messy. Template types don't get compiled into libraries at all and must be included from a header file in every source file in which they're used. This normally wouldn't be a problem, but the Serde definitions can create circular dependencies, and since the implementations can't be compiled into a library, there's no practical way to resolve organize the definitions that prevents circular dependency errors. Technically, the user can declare all their template Serde implementations in advance, but this is totally impractical.
+The goal was to compile Serde definitions into libraries which could be linked against. If you aren't using template types, this works great. However, template types get messy. Template types don't get compiled into libraries at all and must be included from a header file in every source file in which they're used. This normally wouldn't be a problem, but the Serde definitions can create circular dependencies, and since the implementations can't be compiled into a library, there's no practical way to organize the definitions that prevents circular dependency errors. Technically, the user can declare all their template Serde implementations in advance, but this is totally impractical.
 
 The following example demonstrates this issue. Notice that there's a linker error no matter which way I choose to order the serialize() definitions:
 ```c++
@@ -103,8 +103,6 @@ There are other frustrating problems too around include ordering.
 #include "kingw/serde_json.hpp"
 serde_json::from_string(std::vector<int>{ 1, 2, 3 });
 ```
-
-I'd love to see if someone can figure this out. But I think I'm going to wait for C++ Modules to become popular and stick with those instead...
 
 
 ## Basic Usage
