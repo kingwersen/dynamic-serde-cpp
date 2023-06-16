@@ -1,4 +1,4 @@
-# dynamic-serde-cpp (:warning: discontinued)
+# dynamic-serde-cpp (discontinued)
 
 ![CI Status](https://github.com/kingwersen/dynamic-serde-cpp/actions/workflows/linux.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kingwersen_dynamic-serde-cpp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=kingwersen_dynamic-serde-cpp)
@@ -31,6 +31,8 @@ See [serdepp](https://github.com/injae/serdepp/tree/main) for a faster, header-o
 ## :warning: Discontinuation Notice :warning:
 
 During development I found some significant logic gaps in the C++ compiler/linker that make this Serde implementation impractical. There are certain use cases that are impossible without taxing the end user.
+
+This implementation is incomplete and I do not plan to finish it.
 
 The goal was to compile Serde definitions into libraries which could be linked against. If you aren't using template types, this works great. However, template types get messy. Template types don't get compiled into libraries at all and must be included from a header file in every source file in which they're used. This normally wouldn't be a problem, but the Serde definitions can create circular dependencies, and since the implementations can't be compiled into a library, there's no practical way to resolve organize the definitions that prevents circular dependency errors. Technically, the user can declare all their template Serde implementations in advance, but this is totally impractical.
 
