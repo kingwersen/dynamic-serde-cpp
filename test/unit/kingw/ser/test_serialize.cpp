@@ -19,13 +19,13 @@ TEST(KingwSerde, SerializeSeq) {
     MockSerialize mock_serialize2;
     MockSerialize mock_serialize3;
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, seq_begin(_)).Times(1);
+    EXPECT_CALL(mock_serializer, seq_begin(3)).Times(1);
     EXPECT_CALL(mock_serializer, seq_serialize_element(Ref(mock_serialize1))).Times(1);
     EXPECT_CALL(mock_serializer, seq_serialize_element(Ref(mock_serialize2))).Times(1);
     EXPECT_CALL(mock_serializer, seq_serialize_element(Ref(mock_serialize3))).Times(1);
     EXPECT_CALL(mock_serializer, seq_end()).Times(1);
 
-    auto seq = mock_serializer.serialize_seq();
+    auto seq = mock_serializer.serialize_seq(3);
     seq.serialize_element(mock_serialize1);
     seq.serialize_element(mock_serialize2);
     seq.serialize_element(mock_serialize3);
@@ -35,9 +35,10 @@ TEST(KingwSerde, SerializeSeq) {
 /// If end() is called manually, then seq_end() will not be called again on repeat or at destruction.
 TEST(KingwSerde, SerializeSeqEnd) {
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, seq_end).Times(1);
+    EXPECT_CALL(mock_serializer, seq_begin(0)).Times(1);
+    EXPECT_CALL(mock_serializer, seq_end()).Times(1);
 
-    auto seq = mock_serializer.serialize_seq();
+    auto seq = mock_serializer.serialize_seq(0);
     seq.end();
     seq.end();
 }
@@ -55,7 +56,7 @@ TEST(KingwSerde, SerializeMap) {
     MockSerialize mock_serialize7;
     MockSerialize mock_serialize8;
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, map_begin(_)).Times(1);
+    EXPECT_CALL(mock_serializer, map_begin(4)).Times(1);
     EXPECT_CALL(mock_serializer, map_serialize_key(Ref(mock_serialize1))).Times(1);
     EXPECT_CALL(mock_serializer, map_serialize_value(Ref(mock_serialize2))).Times(1);
     EXPECT_CALL(mock_serializer, map_serialize_entry(Ref(mock_serialize3), Ref(mock_serialize4))).Times(1);
@@ -64,7 +65,7 @@ TEST(KingwSerde, SerializeMap) {
     EXPECT_CALL(mock_serializer, map_serialize_entry(Ref(mock_serialize7), Ref(mock_serialize8))).Times(1);
     EXPECT_CALL(mock_serializer, map_end()).Times(1);
 
-    auto map = mock_serializer.serialize_map();
+    auto map = mock_serializer.serialize_map(4);
     map.serialize_key(mock_serialize1);
     map.serialize_value(mock_serialize2);
     map.serialize_entry(mock_serialize3, mock_serialize4);
@@ -77,9 +78,10 @@ TEST(KingwSerde, SerializeMap) {
 /// If end() is called manually, then map_end() will not be called again on repeat or at destruction.
 TEST(KingwSerde, SerializeMapEnd) {
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, map_end).Times(1);
+    EXPECT_CALL(mock_serializer, map_begin(0)).Times(1);
+    EXPECT_CALL(mock_serializer, map_end()).Times(1);
 
-    auto map = mock_serializer.serialize_map();
+    auto map = mock_serializer.serialize_map(0);
     map.end();
     map.end();
 }
@@ -112,9 +114,10 @@ TEST(KingwSerde, SerializeStruct) {
 /// If end() is called manually, then struct_end() will not be called again on repeat or at destruction.
 TEST(KingwSerde, SerializeStructEnd) {
     MockSerializer mock_serializer;
-    EXPECT_CALL(mock_serializer, struct_end).Times(1);
+    EXPECT_CALL(mock_serializer, struct_begin(_, _)).Times(1);
+    EXPECT_CALL(mock_serializer, struct_end()).Times(1);
 
-    auto state = mock_serializer.serialize_struct("example");
+    auto state = mock_serializer.serialize_struct("example", 0);
     state.end();
     state.end();
 }

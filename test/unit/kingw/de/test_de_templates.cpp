@@ -76,6 +76,30 @@ TEST(KingwSerde, StdMapDeserialize) {
     de::deserialize(deserializer, map);
 }
 
+/// de::accessor(std::map<K, V>)::deserialize() invokes de::deserialize(std::map<K, V>)
+///
+TEST(KingwSerde, StdMapDeAccessor) {
+    de::MockDeserializer deserializer;
+    EXPECT_CALL(deserializer, deserialize_map(WhenDynamicCastTo<de::StdMapVisitor<int, int> &>(_)))
+        .Times(1);
+
+    std::map<int, int> map;
+    de::Accessor<std::map<int, int>> accessor = de::accessor(map);
+    accessor.deserialize(deserializer);
+
+    auto traits = serde::TypeTraits::of<std::map<int, int>>();
+    EXPECT_EQ(accessor.traits(), traits);
+}
+
+/// de::Accessor<std::map<K, V>>::traits() invokes TypeTraits::of<std::map<K, V>>()
+///
+TEST(KingwSerde, StdMapDeAccessorTraits) {
+    std::map<int, int> map;
+    de::Accessor<std::map<int, int>> accessor = de::accessor(map);
+    auto traits = serde::TypeTraits::of<std::map<int, int>>();
+    EXPECT_EQ(accessor.traits(), traits);
+}
+
 
 /// StdVectorVisitor<T>::expecting() returns "a sequence of items"
 ///
@@ -135,6 +159,27 @@ TEST(KingwSerde, StdVectorDeserialize) {
 
     std::vector<int> vec;
     de::deserialize(deserializer, vec);
+}
+
+/// de::accessor(std::vector<T>)::deserialize() invokes de::deserialize(std::vector<T>)
+///
+TEST(KingwSerde, StdVectorDeAccessor) {
+    de::MockDeserializer deserializer;
+    EXPECT_CALL(deserializer, deserialize_seq(WhenDynamicCastTo<de::StdVectorVisitor<int> &>(_)))
+        .Times(1);
+
+    std::vector<int> vec;
+    de::Accessor<std::vector<int>> accessor = de::accessor(vec);
+    accessor.deserialize(deserializer);
+}
+
+/// de::Accessor<std::vector<T>>::traits() invokes TypeTraits::of<std::vector<int>>()
+///
+TEST(KingwSerde, StdVectorDeAccessorTraits) {
+    std::vector<int> vec;
+    de::Accessor<std::vector<int>> accessor = de::accessor(vec);
+    auto traits = serde::TypeTraits::of<std::vector<int>>();
+    EXPECT_EQ(accessor.traits(), traits);
 }
 
 }  // namespace

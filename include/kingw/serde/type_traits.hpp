@@ -43,5 +43,14 @@ struct TypeTraits {
     bool is_class = false;
 };
 
+inline bool operator==(const TypeTraits & lh, const TypeTraits & rh) {
+    return lh.is_bool == rh.is_bool
+        && lh.is_integral == rh.is_integral
+        && lh.is_floating_point == rh.is_floating_point
+        && lh.is_arithmetic == rh.is_arithmetic
+        && lh.is_string == rh.is_string
+        && lh.is_class == rh.is_class;
+}
+
 }  // namespace serde
 }  // namespace kingw
