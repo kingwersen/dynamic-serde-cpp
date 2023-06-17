@@ -35,7 +35,8 @@ target_sources(kingw_dynamic_serde_test
         "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/de/test_deserialize.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/de/test_integral_visitors.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/ser/test_ser_templates.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/ser/test_serialize.cpp")
+        "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/ser/test_serialize.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/unit/kingw/serde/test_derive.cpp")
 target_link_libraries(kingw_dynamic_serde_test
     PRIVATE
         kingw::dynamic_serde

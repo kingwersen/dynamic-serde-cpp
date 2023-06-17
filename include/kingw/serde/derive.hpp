@@ -63,6 +63,11 @@ struct FieldDefinition {
     }
 
     /// @brief Helper function to deserialize this field into an object
+    ///
+    /// The de::Deserializer implementation may choose to deserialize a structure
+    /// as a set of key-value pairs (such as for JSON) or as a sequence of unnamed,
+    /// ordered elements (such as binary). This implementation is used for key-value pairs.
+    ///
     /// @param map de::Deserializer helper class, from deserialize_struct()
     /// @param output Instance of Struct to deserialize
     void deserialize_map(de::Deserializer::MapAccess & map, Struct & output) const {
@@ -71,6 +76,11 @@ struct FieldDefinition {
     }
 
     /// @brief Helper function to deserialize this field into an object
+    ///
+    /// The de::Deserializer implementation may choose to deserialize a structure
+    /// as a set of key-value pairs (such as for JSON) or as a sequence of unnamed,
+    /// ordered elements (such as binary). This implementation is used for sequences.
+    ///
     /// @param seq de::Deserializer helper class, from deserialize_struct()
     /// @param output Instance of Struct to deserialize
     void deserialize_seq(de::Deserializer::SeqAccess & seq, Struct & output) const {
