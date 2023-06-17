@@ -3,6 +3,7 @@
 #include <gmock/gmock.h>
 
 #include "kingw/mock/de/mock_deserializer.hpp"
+#include "kingw/mock/de/mock_deserialize.hpp"
 #include "kingw/de/integral_visitors.hpp"
 
 using namespace kingw::de;
@@ -37,6 +38,17 @@ TEST(KingwSerde, VisitorNotImplemented) {
     EXPECT_THROW(visitor.visit_string(""), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_seq(mock_seq_access), Visitor::NotImplementedException);
     EXPECT_THROW(visitor.visit_map(mock_map_access), Visitor::NotImplementedException);
+}
+
+/// deserialize<de::Deserializer>(deserializer, value) will invoke value.deserialize(deserializer)
+///
+TEST(KingwSerde, DeserializePolymorphic) {
+    MockDeserializer mock_deserializer;
+    MockDeserialize mock_deserialize;
+    EXPECT_CALL(mock_deserialize, deserialize(Ref(mock_deserializer)))
+        .Times(1);
+
+    deserialize<Deserialize>(mock_deserializer, mock_deserialize);
 }
 
 /// deserialize<bool>(deserializer, value) will invoke deserializer.deserialize_bool(BoolVisitor)
